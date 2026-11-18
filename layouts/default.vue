@@ -16,11 +16,26 @@ const runtimeConfig = useRuntimeConfig()
 
 const lang = computed(() => normalizeLocale(i18n.locale.value))
 const profile = computed(() => HUSSEIN_DATA[lang.value])
+const cleanPath = computed(() => {
+  const raw = String(route.path || '/')
+  const stripped = raw.replace(/^\/en(?=\/|$)/, '') || '/'
+  return stripped.length > 1 && stripped.endsWith('/') ? stripped.slice(0, -1) : stripped
+})
 const siteUrl = String(runtimeConfig?.public?.siteUrl || '')
 const ogImageUrl = `${siteUrl}${lang.value === 'en' ? '/og-en.png' : '/og-ar.png'}`
 const ogAlt = lang.value === 'en'
   ? 'Al Hussein Mohamed Abdallah — Legal Researcher & Junior Legal Associate, Egyptian Bar Association'
   : 'الأستاذ الحسين محمد عبدالله — باحث قانوني ومحامٍ متدرب، عضو نقابة المحامين المصرية'
+const arAlternateUrl = `${siteUrl}${cleanPath.value}`
+const enAlternateUrl = `${siteUrl}${cleanPath.value === '/' ? '/en' : `/en${cleanPath.value}`}`
+const canonicalUrl = lang.value === 'en' ? enAlternateUrl : arAlternateUrl
+
+useHead({
+  link: [
+    { rel: 'alternate', type: 'text/plain', title: 'LLMs Dossier', href: `${siteUrl}/llms.txt` },
+    { rel: 'alternate', type: 'application/json', title: 'Structured Legal Dossier API', href: `${siteUrl}/api/dossier` }
+  ]
+})
 
 useSeoMeta({
   ogSiteName: lang.value === 'en'
@@ -31,14 +46,9 @@ useSeoMeta({
   ogImageWidth: '1200',
   ogImageHeight: '630',
   ogImageAlt: ogAlt,
-  ogUrl: siteUrl ? `${siteUrl}${String(route.path || '/')}` : undefined,
+  ogUrl: siteUrl ? canonicalUrl : undefined,
   twitterImage: ogImageUrl,
   twitterImageAlt: ogAlt
-})
-const cleanPath = computed(() => {
-  const raw = String(route.path || '/')
-  const stripped = raw.replace(/^\/en(?=\/|$)/, '') || '/'
-  return stripped.length > 1 && stripped.endsWith('/') ? stripped.slice(0, -1) : stripped
 })
 
 const overviewHref = computed(() => i18n.localePath('/'))
@@ -227,7 +237,7 @@ function onCmdBackdropClick(event: any) {
     </div>
 
     <!-- Clean Two-Tier Sticky Header (Zero Horizontal Overflow) -->
-    <header class="no-print border-b rx-divider bg-[var(--surface)]/95 backdrop-blur-md sticky top-0 z-30 shadow-sm">
+    <header class="no-print border-b rx-divider bg-[var(--surface)] lg:bg-[var(--surface)]/95 lg:backdrop-blur-sm sticky top-0 z-30 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 sm:px-8">
         <div class="flex items-center justify-between py-3 gap-4">
           <div class="flex items-center gap-3.5 min-w-0">
@@ -237,7 +247,7 @@ function onCmdBackdropClick(event: any) {
               class="w-12 h-12 rounded-full overflow-hidden border-2 border-[var(--accent)] shrink-0 shadow-sm hover:scale-105 transition-transform bg-[var(--surface-alt)]"
               :aria-label="profile.name"
             >
-              <img src="/images/alhussein_portrait.jpg" :alt="profile.name" width="48" height="48" class="w-full h-full object-cover object-top">
+              <img src="/images/alhussein_portrait-sm.webp" :alt="profile.name" width="48" height="48" decoding="async" class="w-full h-full object-cover object-top">
             </ResuxLink>
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">

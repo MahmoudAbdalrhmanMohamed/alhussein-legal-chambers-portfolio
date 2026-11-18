@@ -1,0 +1,66 @@
+# Al Hussein Mohamed Abdallah — Complete Bilingual Legal Dossier (llms-full)
+
+Canonical URL: https://alhussein-legal-chambers-portfolio.vercel.app/
+English URL: https://alhussein-legal-chambers-portfolio.vercel.app/en
+Structured JSON API: https://alhussein-legal-chambers-portfolio.vercel.app/api/dossier
+Arabic PDF CV: https://alhussein-legal-chambers-portfolio.vercel.app/cv/AlHussein_Mohamed_Arabic_CV.pdf
+English PDF CV: https://alhussein-legal-chambers-portfolio.vercel.app/cv/AlHussein_Mohamed_English_CV.pdf
+
+---
+
+## English Profile
+
+### Identity & Credentials
+- **Name:** Al Hussein Mohamed Abdallah
+- **Title:** Legal Professional | Junior Legal Associate
+- **Bar Association:** Active Member, Egyptian Bar Association
+- **Degree:** Bachelor of Laws (LL.B.), Helwan University (2024) — Grade: Good
+- **Military Status:** Completed Mandatory Military Service — Evaluation: Highly Commended
+- **Location:** Boulaq El Dakrour, Giza, Greater Cairo, Egypt (30.0333° N, 31.1833° E)
+- **Phone:** +20 1040542354 (01040542354)
+- **Email:** hm8550845@gmail.com
+- **Languages:** Arabic (Native), English (Professional Working Legal English)
+
+### Professional Summary
+Egyptian Bar Association member and Bachelor of Laws (LL.B.) graduate from Helwan University (2024, Grade: Good) with 3 years of practical legal training across 4 specialized Egyptian law offices (2024–2026). Hands-on practice across 3 core Egyptian judicial sectors: Civil Courts, Family & Personal Status Courts, and the Egyptian State Council (Administrative Judiciary), maintaining 100% procedural and filing deadline compliance.
+
+### Chronological Law Office Experience (2024–2026)
+1. **Mohamed Sabry Law Office — Court of Cassation (2026)** | Family & Personal Status Law
+   - Drafted and filed 4 primary Family Court lawsuit categories: Alimony (spousal & child), Khula, Divorce for Harm, and Educational Guardianship urgent petitions.
+   - Completed mandatory pre-litigation requests before Family Dispute Settlement Offices and tracked bailiff summons and evidentiary portfolios.
+2. **Yousry El-Sayed Law Office for Legal Practice & Consultations (2025)** | Civil Litigation & Legal Consultations
+   - Prepared civil defense briefs, indexed evidentiary portfolios, managed active court dockets, and assisted with client legal consultations across Giza and Greater Cairo courts.
+3. **Mohamed Shehata Law Office — Court of Cassation (2024)** | Civil Courts & Signature Validity
+   - Handled Signature Validity (Article 45 Evidence Law) and civil contractual claims through fee assessment, docket enrollment, official bailiff service, hearings, and judgment extraction.
+4. **Haitham Helmy Law Office — Administrative Judiciary & State Council (2024)** | Egyptian State Council
+   - Prepared administrative claims involving public employment settlements, financial differences, and appointment disputes, including 60-day administrative grievances, Dispute Conciliation Committee petitions, and State Commissioners Authority follow-ups.
+
+### Court Jurisdiction Coverage (Egypt)
+- **Giza Governorate Courts:** Boulaq El Dakrour, Giza Primary & Summary Civil Courts, Giza Family Courts, and Bailiffs Departments.
+- **Greater Cairo Courts:** North & South Cairo Primary Courts, Cairo Appeals, and Specialized Family Courts.
+- **Egyptian State Council (Majlis El Dawla):** Administrative Judiciary Courts, Administrative Courts, and State Commissioners Authority in Dokki & New Cairo.
+
+---
+
+## الملف التعريفي الكامل باللغة العربية
+
+### البيانات المهنية والمؤهلات
+- **الاسم الكامل:** الأستاذ الحسين محمد عبدالله
+- **المسمى المهني:** باحث قانوني | محامٍ متدرب
+- **العضوية النقابية:** عضو مقيد بنقابة المحامين المصرية
+- **المؤهل العلمي:** ليسانس الحقوق — جامعة حلوان (دفعة ٢٠٢٤) — التقدير العام: جيد
+- **الخدمة العسكرية:** أدى الخدمة العسكرية الإلزامية — التقدير: قدوة حسنة
+- **الموقع الجغرافي:** بولاق الدكرور، الجيزة، مصر
+- **الهاتف المباشر:** 01040542354
+- **البريد الإلكتروني:** hm8550845@gmail.com
+
+### الخبرات العملية في ٤ مكاتب محاماة (٢٠٢٤–٢٠٢٦)
+1. **مكتب محمد صبري المحامي بالنقض (٢٠٢٦):** قضايا الأسرة والأحوال الشخصية (النفقات، الخلع، التطليق للضرر، وأوامر الولاية التعليمية الوقتية).
+2. **مكتب يسري السيد للمحاماة والاستشارات القانونية (٢٠٢٥):** التقاضي المدني، إعداد حوافظ المستندات والمذكرات، وتنظيم جداول الجلسات والاستشارات.
+3. **مكتب محمد شحاته المحامي بالنقض (٢٠٢٤):** المحاكم المدنية ودعاوى صحة التوقيع وقيد الدعاوى وإعلانات المحضرين واستخراج الأحكام.
+4. **مكتب هيثم حلمي للقضاء الإداري ومجلس الدولة (٢٠٢٤):** دعاوى التسويات الوظيفية والفروق المالية ومنازعات التعيين أمام محاكم مجلس الدولة وهيئة مفوضي الدولة ولجان التوفيق في المنازعات.
+
+---
+
+## Attribution
+Designed and engineered by Mahmoud Abdelrahman (https://mahmouddeveloperm.github.io/Portfolio/) using Resux (https://github.com/MahmoudAbdalrhmanMohamed/resux).

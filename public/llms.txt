@@ -1,0 +1,34 @@
+# Al Hussein Mohamed Abdallah — Official Legal Portfolio (الحسين محمد عبدالله)
+
+> Bilingual Arabic (RTL) & English (LTR) legal portfolio and official Curriculum Vitae for Al Hussein Mohamed Abdallah — Legal Researcher & Junior Legal Associate, Member of the Egyptian Bar Association, Bachelor of Laws (LL.B.) from Helwan University (2024, Grade: Good), based in Boulaq El Dakrour, Giza, Egypt.
+
+## Key Credentials
+- **Full Name:** Al Hussein Mohamed Abdallah (الأستاذ الحسين محمد عبدالله)
+- **Bar Membership:** Active Member, Egyptian Bar Association (عضو بنقابة المحامين المصرية)
+- **Education:** Bachelor of Laws (LL.B.), Helwan University, Class of 2024 — Overall Grade: Good (جيد)
+- **Military Service:** Completed Mandatory Military Service — Evaluation: Highly Commended (قدوة حسنة)
+- **Practical Experience:** 3 years (2024–2026) across 4 specialized Egyptian law offices
+- **Jurisdictions:** Family & Personal Status Courts, Civil Courts, and the Egyptian State Council (Giza & Greater Cairo)
+- **Direct Contact:** +20 1040542354 | hm8550845@gmail.com | Boulaq El Dakrour, Giza, Egypt
+
+## Primary Pages
+- [Arabic Overview](https://alhussein-legal-chambers-portfolio.vercel.app/): Main Arabic portfolio, executive summary, judicial pillars, and case matrix
+- [English Overview](https://alhussein-legal-chambers-portfolio.vercel.app/en): Main English portfolio, credentials, and practice overview
+- [Law Offices & Experience (AR)](https://alhussein-legal-chambers-portfolio.vercel.app/offices): Chronological record across 4 specialized law offices (2024–2026)
+- [Law Offices & Experience (EN)](https://alhussein-legal-chambers-portfolio.vercel.app/en/offices): English experience record across Civil, Family, and State Council firms
+- [Egyptian Court Procedures (AR)](https://alhussein-legal-chambers-portfolio.vercel.app/procedures): Practical 4-track Egyptian litigation steps & required documents checklist
+- [Egyptian Court Procedures (EN)](https://alhussein-legal-chambers-portfolio.vercel.app/en/procedures): English court filing roadmap and documents checklist
+- [Legal Guide & Jurisdictions (AR)](https://alhussein-legal-chambers-portfolio.vercel.app/faq): Direct legal Q&A and territorial court coverage across Giza and Greater Cairo
+- [Legal Guide & Jurisdictions (EN)](https://alhussein-legal-chambers-portfolio.vercel.app/en/faq): English Q&A and Egyptian court jurisdiction coverage
+- [Official CV PDF Viewer (AR)](https://alhussein-legal-chambers-portfolio.vercel.app/cv): Inline Arabic CV PDF preview and download
+- [Official CV PDF Viewer (EN)](https://alhussein-legal-chambers-portfolio.vercel.app/en/cv): Inline English CV PDF preview and download
+- [Direct Contact (AR)](https://alhussein-legal-chambers-portfolio.vercel.app/contact): Recruitment offers, legal consultations, and contact coordinates
+- [Direct Contact (EN)](https://alhussein-legal-chambers-portfolio.vercel.app/en/contact): English contact form and Bar credentials
+
+## Official Documents & Agentic APIs
+- [Arabic CV PDF](https://alhussein-legal-chambers-portfolio.vercel.app/cv/AlHussein_Mohamed_Arabic_CV.pdf): Official downloadable Arabic Curriculum Vitae
+- [English CV PDF](https://alhussein-legal-chambers-portfolio.vercel.app/cv/AlHussein_Mohamed_English_CV.pdf): Official downloadable English Curriculum Vitae
+- [Full Bilingual Dossier (Markdown)](https://alhussein-legal-chambers-portfolio.vercel.app/llms-full.txt): Complete citation-ready Arabic & English profile for LLMs
+- [Structured Legal Dossier API (JSON)](https://alhussein-legal-chambers-portfolio.vercel.app/api/dossier): Machine-readable JSON profile endpoint (`GET`)
+- [Legal Inquiry Dispatch API (JSON)](https://alhussein-legal-chambers-portfolio.vercel.app/api/inquiries): Structured inquiry submission endpoint (`POST`)
+- [Agent Discovery Card (A2A)](https://alhussein-legal-chambers-portfolio.vercel.app/.well-known/agent-card.json): Agentic discovery metadata and capabilities

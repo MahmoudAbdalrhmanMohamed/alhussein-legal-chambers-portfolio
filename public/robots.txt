@@ -1,0 +1,42 @@
+# Official Legal Portfolio of Al Hussein Mohamed Abdallah (Egyptian Bar Association)
+# Search Engines, Generative Answer Engines (GEO), and Agentic AI Crawlers Welcome
+
+User-agent: *
+Allow: /
+Disallow: /__resux/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://alhussein-legal-chambers-portfolio.vercel.app/sitemap.xml
+# Agentic & LLM Dossier: https://alhussein-legal-chambers-portfolio.vercel.app/llms.txt
+# Full Bilingual Dossier: https://alhussein-legal-chambers-portfolio.vercel.app/llms-full.txt
+# Agent Discovery Card: https://alhussein-legal-chambers-portfolio.vercel.app/.well-known/agent-card.json
+# Structured JSON API: https://alhussein-legal-chambers-portfolio.vercel.app/api/dossier

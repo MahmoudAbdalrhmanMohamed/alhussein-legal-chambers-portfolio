@@ -6,7 +6,7 @@
   "description": "Bilingual (Arabic RTL & English LTR) Legal Chambers Portfolio for Al Hussein Mohamed Abdallah built with resuxjs@0.4.0-beta.7",
   "scripts": {
     "dev": "resux dev",
-    "build": "resux build",
+    "build": "tailwindcss -i assets/css/tailwind.css -o public/tailwind.css --minify && resux build",
     "start": "resux start",
     "preview": "resux preview",
     "typecheck": "tsc --noEmit"

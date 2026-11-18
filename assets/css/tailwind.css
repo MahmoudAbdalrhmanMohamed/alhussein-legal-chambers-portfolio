@@ -6,6 +6,17 @@
    DYNAMIC EXECUTIVE PALETTE — ALL ACCENTS REACT TO ACTIVE COLOR CHOICE
    ===================================================================== */
 :root {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-alt: #F1F5F9;
+  --surface-elevated: #FFFFFF;
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --ink-subtle: #64748B;
+  --border: #E2E8F0;
+  --border-strong: #0F172A;
+  --code-bg: #0F172A;
+  --code-ink: #F1F5F9;
   --accent: #1B365D;
   --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface, #FFFFFF));
   --accent-border: color-mix(in srgb, var(--accent) 32%, var(--border, #E2E8F0));
@@ -97,29 +108,29 @@ html, body {
 }
 
 html[lang="ar"] body {
-  font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans Arabic fallback: Arial', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.72;
 }
 
 html[lang="en"] body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans fallback: Arial', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.62;
 }
 
 html[lang="ar"] .font-serif-editorial {
-  font-family: 'Readex Pro', 'IBM Plex Sans Arabic', sans-serif;
+  font-family: 'Readex Pro', 'Readex Pro fallback: Arial', 'IBM Plex Sans Arabic', 'IBM Plex Sans Arabic fallback: Arial', sans-serif;
   line-height: 1.32;
   letter-spacing: -0.01em;
 }
 
 html[lang="en"] .font-serif-editorial {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans fallback: Arial', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.18;
   letter-spacing: -0.02em;
 }
 
 .font-mono-code {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: 'JetBrains Mono', 'JetBrains Mono fallback: Courier New', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .ltr-num {

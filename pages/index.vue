@@ -137,8 +137,8 @@ function copySummaryCv() {
       <!-- Official Portrait & Counsel Dossier Card -->
       <div class="lg:col-span-5 rx-card-double p-5 sm:p-6 flex flex-col justify-between space-y-5 rx-stagger-2">
         <div class="flex flex-col sm:flex-row items-center gap-4 border-b rx-divider pb-4">
-          <div class="w-28 h-36 sm:w-32 sm:h-40 rounded-xl overflow-hidden border-2 border-[var(--accent)] shadow-md shrink-0 bg-[var(--surface-alt)]">
-            <img src="/images/alhussein_portrait.jpg" :alt="profile.cardName" width="128" height="160" fetchpriority="high" class="w-full h-full object-cover object-top">
+          <div class="w-28 h-32 sm:w-32 sm:h-36 rounded-xl overflow-hidden border-2 border-[var(--accent)] shadow-md shrink-0 bg-[var(--surface-alt)]">
+            <img src="/images/alhussein_portrait.webp" :alt="profile.cardName" width="128" height="146" fetchpriority="high" decoding="async" class="w-full h-full object-cover object-top">
           </div>
           <div class="text-center sm:text-start space-y-1.5">
             <span class="inline-block text-[11px] px-2.5 py-0.5 rx-badge-brass font-bold">
@@ -156,16 +156,16 @@ function copySummaryCv() {
           </div>
         </div>
 
-        <dl class="space-y-2.5 text-xs sm:text-sm">
+        <div class="space-y-2.5 text-xs sm:text-sm">
           <div
             v-for="(metric, idx) in profile.metrics"
             :key="idx"
             class="flex items-baseline justify-between gap-2 border-b rx-divider pb-2 last:border-b-0 last:pb-0"
           >
-            <dt class="text-xs text-[var(--ink-muted)]">{{ metric[0] }}</dt>
-            <dd class="text-xs font-bold text-end">{{ metric[1] }}</dd>
+            <span class="text-xs text-[var(--ink-muted)]">{{ metric[0] }}</span>
+            <span class="text-xs font-bold text-end">{{ metric[1] }}</span>
           </div>
-        </dl>
+        </div>
 
         <div class="pt-3 border-t rx-divider grid grid-cols-1 sm:grid-cols-2 gap-2">
           <ResuxLink :to="contactHref" view-transition class="w-full py-2.5 px-3 text-xs rx-btn-accent text-center font-bold block">
@@ -271,9 +271,12 @@ function copySummaryCv() {
             </div>
             <h3 class="font-serif-editorial text-xl font-bold leading-snug">{{ item.title }}</h3>
             <div class="text-xs text-[var(--ink-muted)] font-semibold">{{ item.subtitle }}</div>
-            <ul class="space-y-1.5 pt-2 text-xs text-[var(--ink-muted)] list-disc ps-4 leading-relaxed">
-              <li v-for="(h, hIdx) in item.highlights.slice(0, 3)" :key="hIdx">{{ h }}</li>
-            </ul>
+            <div class="space-y-1.5 pt-2 text-xs text-[var(--ink-muted)] leading-relaxed">
+              <p v-for="(h, hIdx) in item.highlights.slice(0, 3)" :key="hIdx" class="flex items-start gap-2">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" aria-hidden="true" />
+                <span>{{ h }}</span>
+              </p>
+            </div>
           </div>
           <div class="pt-3 border-t rx-divider flex items-center justify-between">
             <button
@@ -319,9 +322,12 @@ function copySummaryCv() {
           <div class="text-xs font-bold text-[var(--ink-muted)]">
             {{ lang === 'ar' ? 'المسؤوليات العملية والإجراءات القضائية المنفذة' : 'Verified Practical Responsibilities & Court Procedures' }}
           </div>
-          <ul class="space-y-2.5 list-disc ps-5 text-sm leading-relaxed">
-            <li v-for="(h, idx) in activeDetailItem.highlights" :key="idx">{{ h }}</li>
-          </ul>
+          <div class="space-y-2.5 text-sm leading-relaxed">
+            <p v-for="(h, idx) in activeDetailItem.highlights" :key="idx" class="flex items-start gap-2.5">
+              <span class="mt-2 w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" aria-hidden="true" />
+              <span>{{ h }}</span>
+            </p>
+          </div>
         </div>
         <div class="flex items-center justify-between pt-4 border-t rx-divider">
           <span class="text-xs text-[var(--ink-muted)]">

@@ -118,21 +118,21 @@ function resetDocs() {
           <span class="text-xs px-3 py-1 rx-badge-accent font-bold">{{ activeTrack.badge }}</span>
         </div>
 
-        <ol class="space-y-3.5">
-          <li
+        <div class="space-y-3.5">
+          <div
             v-for="(step, idx) in activeTrack.steps"
             :key="idx"
             class="p-4 rounded-xl border rx-divider bg-[var(--surface-elevated)] flex items-start gap-3.5 transition-colors hover:border-[var(--accent)]"
           >
-            <span class="w-7 h-7 rounded-full rx-btn-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+            <span class="w-7 h-7 rounded-full rx-btn-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
               {{ idx + 1 }}
             </span>
             <div class="space-y-1">
               <div class="text-sm font-bold text-[var(--accent)]">{{ step[0] }}</div>
               <p class="text-xs sm:text-sm text-[var(--ink-muted)] leading-relaxed">{{ step[1] }}</p>
             </div>
-          </li>
-        </ol>
+          </div>
+        </div>
 
         <div class="p-4 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent-border)] space-y-1.5 text-xs">
           <div class="font-bold text-[var(--accent)]">

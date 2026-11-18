@@ -61,8 +61,8 @@ export default defineResuxPlugin(() => {
   if ((globalThis as Record<string, unknown>)[guardKey]) return
   ;(globalThis as Record<string, unknown>)[guardKey] = true
 
-  syncNavigationAndPreferences()
-
+  // Initial theme, accent, and active nav state are already set by SSR + inline head script.
+  // Re-sync only after client-side soft transitions to avoid initial forced reflow.
   window.addEventListener('resux:route-transition', (event: Event) => {
     const detail = (event as CustomEvent<{ state?: string }>)?.detail
     if (detail?.state === 'complete') {

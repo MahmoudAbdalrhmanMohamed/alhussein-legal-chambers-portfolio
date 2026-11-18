@@ -10,3 +10,9 @@ dist/
 .env.*
 !.env.example
 *.log
+.resux
+.resux-nitro
+.nitro
+.output
+dist
+node_modules

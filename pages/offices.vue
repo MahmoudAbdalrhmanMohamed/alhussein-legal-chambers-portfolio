@@ -119,9 +119,12 @@ function onModalBackdropClick(event: any) {
           </div>
           <h3 class="font-serif-editorial text-xl font-bold leading-snug">{{ item.title }}</h3>
           <p class="text-xs text-[var(--ink-muted)] font-semibold">{{ item.subtitle }}</p>
-          <ul class="space-y-2 pt-2 text-xs text-[var(--ink-muted)] list-disc ps-4 leading-relaxed">
-            <li v-for="(h, idx) in item.highlights" :key="idx">{{ h }}</li>
-          </ul>
+          <div class="space-y-2 pt-2 text-xs text-[var(--ink-muted)] leading-relaxed">
+            <p v-for="(h, idx) in item.highlights" :key="idx" class="flex items-start gap-2">
+              <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" aria-hidden="true" />
+              <span>{{ h }}</span>
+            </p>
+          </div>
         </div>
         <div class="pt-3 border-t rx-divider flex items-center justify-between gap-2">
           <button type="button" class="px-3.5 py-1.5 text-xs font-bold rx-btn-outline" @click="openDetailModal(item.id)">
@@ -164,9 +167,12 @@ function onModalBackdropClick(event: any) {
           <div class="text-xs font-bold text-[var(--ink-muted)]">
             {{ lang === 'ar' ? 'المسؤوليات العملية والإجراءات القضائية المنفذة' : 'Verified Practical Responsibilities & Court Procedures' }}
           </div>
-          <ul class="space-y-2.5 list-disc ps-5 text-sm leading-relaxed">
-            <li v-for="(h, idx) in activeDetailItem.highlights" :key="idx">{{ h }}</li>
-          </ul>
+          <div class="space-y-2.5 text-sm leading-relaxed">
+            <p v-for="(h, idx) in activeDetailItem.highlights" :key="idx" class="flex items-start gap-2.5">
+              <span class="mt-2 w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" aria-hidden="true" />
+              <span>{{ h }}</span>
+            </p>
+          </div>
         </div>
         <div class="flex items-center justify-between pt-4 border-t rx-divider">
           <span class="text-xs text-[var(--ink-muted)]">
