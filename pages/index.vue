@@ -138,7 +138,21 @@ function copySummaryCv() {
       <div class="lg:col-span-5 rx-card-double p-5 sm:p-6 flex flex-col justify-between space-y-5">
         <div class="flex flex-col sm:flex-row items-center gap-4 border-b rx-divider pb-4">
           <div class="w-28 h-32 sm:w-32 sm:h-36 rounded-xl overflow-hidden border-2 border-[var(--accent)] shadow-md shrink-0 bg-[var(--surface-alt)]">
-            <img src="/images/alhussein_portrait.webp" :alt="profile.cardName" width="128" height="146" fetchpriority="high" decoding="async" class="w-full h-full object-cover object-top">
+            <ResuxImg
+              src="/images/alhussein_portrait.jpg"
+              :alt="profile.cardName"
+              :width="128"
+              :height="146"
+              format="webp"
+              :quality="84"
+              fit="cover"
+              :densities="[1, 2]"
+              priority
+              preload
+              fetchpriority="high"
+              decoding="async"
+              class="w-full h-full object-cover object-top"
+            />
           </div>
           <div class="text-center sm:text-start space-y-1.5">
             <span class="inline-block text-[11px] px-2.5 py-0.5 rx-badge-brass font-bold">

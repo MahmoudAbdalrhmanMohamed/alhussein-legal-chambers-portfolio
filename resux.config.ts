@@ -168,6 +168,9 @@ export default defineResuxConfig({
     '/__resux/chunks/**': {
       headers: { 'cache-control': 'public, max-age=31536000, immutable' }
     },
+    '/__resux/image': {
+      headers: { 'cache-control': 'public, max-age=31536000, s-maxage=31536000, immutable' }
+    },
     '/images/**': {
       headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' }
     },
@@ -177,7 +180,12 @@ export default defineResuxConfig({
   },
   runtimeConfig: {
     public: {
-      siteUrl: SITE_ORIGIN
+      siteUrl: SITE_ORIGIN,
+      image: {
+        format: 'webp',
+        quality: 84,
+        densities: [1, 2]
+      }
     }
   },
   modules: [
@@ -240,7 +248,6 @@ export default defineResuxConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
-        { rel: 'preload', as: 'image', href: '/images/alhussein_portrait.webp', type: 'image/webp', fetchpriority: 'high' },
         ...(INLINE_TAILWIND_CSS ? [] : [{ rel: 'stylesheet', href: '/tailwind.css' }])
       ],
       meta: [

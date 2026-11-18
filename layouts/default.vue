@@ -247,7 +247,19 @@ function onCmdBackdropClick(event: any) {
               class="w-12 h-12 rounded-full overflow-hidden border-2 border-[var(--accent)] shrink-0 shadow-sm hover:scale-105 transition-transform bg-[var(--surface-alt)]"
               :aria-label="profile.name"
             >
-              <img src="/images/alhussein_portrait-sm.webp" :alt="profile.name" width="48" height="48" decoding="async" class="w-full h-full object-cover object-top">
+              <ResuxImg
+                src="/images/alhussein_portrait.jpg"
+                :alt="profile.name"
+                :width="48"
+                :height="48"
+                format="webp"
+                :quality="82"
+                fit="cover"
+                :densities="[1, 2]"
+                loading="eager"
+                decoding="async"
+                class="w-full h-full object-cover object-top"
+              />
             </ResuxLink>
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
