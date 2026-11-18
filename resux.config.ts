@@ -244,6 +244,7 @@ export default defineResuxConfig({
     head: {
       title: 'الحسين محمد عبدالله | باحث قانوني ومحامٍ متدرب',
       link: [
+        { rel: 'preconnect', href: 'https://www.googletagmanager.com' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
@@ -270,8 +271,20 @@ export default defineResuxConfig({
         { name: 'twitter:card', content: 'summary_large_image' }
       ],
       script: [
+        {
+          src: 'https://www.googletagmanager.com/gtm.js?id=GTM-NKD7FWZP',
+          async: true
+        },
+        {
+          innerHTML: `window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());`
+        },
         { innerHTML: PREFS_AND_SHORTCUTS_SCRIPT },
         { type: 'application/ld+json', innerHTML: JSON_LD_GRAPH }
+      ],
+      noscript: [
+        {
+          innerHTML: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NKD7FWZP" height="0" width="0" style="display:none;visibility:hidden"></iframe>`
+        }
       ],
       style: [
         ...(INLINE_TAILWIND_CSS
