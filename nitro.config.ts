@@ -45,39 +45,59 @@ export default defineNitroConfig({
         "cache-control": "no-store"
       }
     },
-    "/__resux/handlers/**": {
+    "/__resux/chunks/**": {
       headers: {
         "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    "/__resux/assets/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    "/__resux/handlers/**": {
+      headers: {
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     },
     "/__resux/plugins/**": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable"
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     },
     "/__resux/middleware/**": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable"
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     },
     "/__resux/vue-islands/**": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable"
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     },
     "/__resux/runtime-client.mjs": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable"
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     },
     "/__resux/client-enhancements.mjs": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable"
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     },
     "/__resux/image": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable"
+        "cache-control": "public, max-age=31536000, s-maxage=31536000, immutable"
+      }
+    },
+    "/images/**": {
+      headers: {
+        "cache-control": "public, max-age=604800, stale-while-revalidate=86400"
+      }
+    },
+    "/cv/**": {
+      headers: {
+        "cache-control": "public, max-age=604800, stale-while-revalidate=86400"
       }
     },
     "/api/**": {
@@ -87,7 +107,7 @@ export default defineNitroConfig({
     },
     "/**": {
       headers: {
-        "cache-control": "no-store"
+        "cache-control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400, must-revalidate"
       }
     }
   },
