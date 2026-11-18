@@ -143,7 +143,7 @@ const JSON_LD_GRAPH = JSON.stringify({
   ]
 })
 
-const PREFS_AND_SHORTCUTS_SCRIPT = `(function(){try{var r=document.documentElement;var t=localStorage.getItem('resux_hussein_theme')||'light';var k=localStorage.getItem('resux_hussein_accent_key')||'navy';var c=localStorage.getItem('resux_hussein_custom_hex')||'#1B365D';var isDark=t==='dark';if(isDark){r.setAttribute('data-theme','dark');}var p={navy:{light:['#1B365D','#FFFFFF'],dark:['#60A5FA','#0B0F17']},emerald:{light:['#14532D','#FFFFFF'],dark:['#34D399','#0B0F17']},burgundy:{light:['#7A2323','#FFFFFF'],dark:['#F87171','#0B0F17']},slate:{light:['#78572A','#FFFFFF'],dark:['#FBBF24','#0B0F17']}};var acc='#1B365D',ink='#FFFFFF';if(isDark||k!=='navy'){if(k==='custom'&&c){acc=c;var h=c.replace('#','');if(h.length===6){var lum=(0.299*parseInt(h.slice(0,2),16)+0.587*parseInt(h.slice(2,4),16)+0.114*parseInt(h.slice(4,6),16))/255;ink=lum>0.62?'#0F172A':'#FFFFFF';}}else{var v=(p[k]||p.navy)[isDark?'dark':'light'];acc=v[0];ink=v[1];}r.style.setProperty('--accent',acc);r.style.setProperty('--accent-ink',ink);r.style.setProperty('--accent-soft','color-mix(in srgb, '+acc+' '+(isDark?'18%':'10%')+', var(--surface))');r.style.setProperty('--accent-border','color-mix(in srgb, '+acc+' '+(isDark?'42%':'30%')+', var(--border))');r.style.setProperty('--secondary',acc);r.style.setProperty('--secondary-soft','color-mix(in srgb, '+acc+' '+(isDark?'16%':'9%')+', var(--surface))');r.style.setProperty('--brass','color-mix(in srgb, '+acc+' 82%, var(--ink))');r.style.setProperty('--brass-soft','color-mix(in srgb, '+acc+' '+(isDark?'20%':'13%')+', var(--surface))');var syncUi=function(){var isAr=(r.getAttribute('lang')||'ar')==='ar';var tl=document.getElementById('btn-theme-text');if(tl){tl.textContent=isAr?(t==='light'?'المظهر الداكن':'المظهر الفاتح'):(t==='light'?'Dark Mode':'Light Mode');}['navy','emerald','burgundy','slate'].forEach(function(id){var b=document.getElementById('swatch-'+id);if(b){b.className=id===k?'swatch-dot active-swatch':'swatch-dot';}});var ci=document.getElementById('custom-color-input');if(ci){ci.value=k==='custom'?c:(p[k]||p.navy).light[0];}var tm=document.querySelector('meta[name="theme-color"]');if(tm){tm.setAttribute('content',acc);}};if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',syncUi,{once:true});}else{syncUi();}}window.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&e.key&&e.key.toLowerCase()==='k'){e.preventDefault();var b=document.getElementById('btn-cmd-open');if(b)b.click();}else if(e.key==='Escape'){var c1=document.getElementById('btn-detail-close');if(c1)c1.click();var c2=document.getElementById('btn-cmd-close');if(c2)c2.click();}});}catch(e){}})();`
+const PREFS_AND_SHORTCUTS_SCRIPT = `(function(){try{var r=document.documentElement;var t=localStorage.getItem('resux_hussein_theme')||'light';var k=localStorage.getItem('resux_hussein_accent_key')||'navy';var c=localStorage.getItem('resux_hussein_custom_hex')||'#1B365D';var isDark=t==='dark';if(isDark){r.setAttribute('data-theme','dark');}var p={navy:{light:['#1B365D','#FFFFFF'],dark:['#60A5FA','#0B0F17']},emerald:{light:['#14532D','#FFFFFF'],dark:['#34D399','#0B0F17']},burgundy:{light:['#7A2323','#FFFFFF'],dark:['#F87171','#0B0F17']},slate:{light:['#78572A','#FFFFFF'],dark:['#FBBF24','#0B0F17']}};var acc='#1B365D',ink='#FFFFFF';if(isDark||k!=='navy'){if(k==='custom'&&c){acc=c;var h=c.replace('#','');if(h.length===6){var lum=(0.299*parseInt(h.slice(0,2),16)+0.587*parseInt(h.slice(2,4),16)+0.114*parseInt(h.slice(4,6),16))/255;ink=lum>0.62?'#0F172A':'#FFFFFF';}}else{var v=(p[k]||p.navy)[isDark?'dark':'light'];acc=v[0];ink=v[1];}var ch=acc.replace('#','');var rr=parseInt(ch.slice(0,2),16)||27,gg=parseInt(ch.slice(2,4),16)||54,bb=parseInt(ch.slice(4,6),16)||93;r.style.setProperty('--accent',acc);r.style.setProperty('--accent-ink',ink);r.style.setProperty('--accent-soft','rgba('+rr+','+gg+','+bb+','+(isDark?0.18:0.10)+')');r.style.setProperty('--accent-border','rgba('+rr+','+gg+','+bb+','+(isDark?0.42:0.28)+')');r.style.setProperty('--secondary',acc);r.style.setProperty('--secondary-soft','rgba('+rr+','+gg+','+bb+','+(isDark?0.16:0.11)+')');r.style.setProperty('--brass',acc);r.style.setProperty('--brass-soft','rgba('+rr+','+gg+','+bb+','+(isDark?0.20:0.13)+')');var syncUi=function(){var isAr=(r.getAttribute('lang')||'ar')==='ar';var tl=document.getElementById('btn-theme-text');if(tl){tl.textContent=isAr?(t==='light'?'المظهر الداكن':'المظهر الفاتح'):(t==='light'?'Dark Mode':'Light Mode');}['navy','emerald','burgundy','slate'].forEach(function(id){var b=document.getElementById('swatch-'+id);if(b){b.className=id===k?'swatch-dot active-swatch':'swatch-dot';}});var ci=document.getElementById('custom-color-input');if(ci){ci.value=k==='custom'?c:(p[k]||p.navy).light[0];}var tm=document.querySelector('meta[name="theme-color"]');if(tm){tm.setAttribute('content',acc);}};if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',syncUi,{once:true});}else{syncUi();}}window.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&e.key&&e.key.toLowerCase()==='k'){e.preventDefault();var b=document.getElementById('btn-cmd-open');if(b)b.click();}else if(e.key==='Escape'){var c1=document.getElementById('btn-detail-close');if(c1)c1.click();var c2=document.getElementById('btn-cmd-close');if(c2)c2.click();}});}catch(e){}})();`
 
 export default defineResuxConfig({
   router: {
@@ -151,16 +151,19 @@ export default defineResuxConfig({
   },
   routeRules: {
     '/**': {
-      headers: { 'cache-control': 'public, max-age=0, must-revalidate' }
+      headers: { 'cache-control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400, must-revalidate' }
+    },
+    '/api/**': {
+      headers: { 'cache-control': 'no-store' }
     },
     '/__resux/runtime-client.mjs': {
-      headers: { 'cache-control': 'public, max-age=0, must-revalidate' }
+      headers: { 'cache-control': 'public, max-age=0, s-maxage=3600, must-revalidate' }
     },
     '/__resux/handlers/**': {
-      headers: { 'cache-control': 'public, max-age=0, must-revalidate' }
+      headers: { 'cache-control': 'public, max-age=0, s-maxage=3600, must-revalidate' }
     },
     '/__resux/plugins/**': {
-      headers: { 'cache-control': 'public, max-age=0, must-revalidate' }
+      headers: { 'cache-control': 'public, max-age=0, s-maxage=3600, must-revalidate' }
     },
     '/__resux/chunks/**': {
       headers: { 'cache-control': 'public, max-age=31536000, immutable' }

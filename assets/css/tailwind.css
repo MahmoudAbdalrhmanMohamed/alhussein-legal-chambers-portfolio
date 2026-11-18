@@ -18,13 +18,13 @@
   --code-bg: #0F172A;
   --code-ink: #F1F5F9;
   --accent: #1B365D;
-  --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface, #FFFFFF));
-  --accent-border: color-mix(in srgb, var(--accent) 32%, var(--border, #E2E8F0));
+  --accent-soft: rgba(27, 54, 93, 0.10);
+  --accent-border: rgba(27, 54, 93, 0.28);
   --accent-ink: #FFFFFF;
-  --secondary: var(--accent);
-  --secondary-soft: color-mix(in srgb, var(--accent) 12%, var(--surface, #FFFFFF));
-  --brass: color-mix(in srgb, var(--accent) 82%, var(--ink, #0F172A));
-  --brass-soft: color-mix(in srgb, var(--accent) 14%, var(--surface, #FFFFFF));
+  --secondary: #1B365D;
+  --secondary-soft: rgba(27, 54, 93, 0.11);
+  --brass: #172E4F;
+  --brass-soft: rgba(27, 54, 93, 0.13);
 }
 
 :root[data-theme="light"], :root[data-theme="parchment"] {
@@ -65,7 +65,7 @@
 html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) var(--bg);
+  scrollbar-color: var(--accent-border) var(--bg);
 }
 
 ::-webkit-scrollbar {
@@ -78,7 +78,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background-color: var(--accent-border);
   border-radius: 9999px;
   border: 2px solid var(--bg);
   transition: background-color 180ms ease;
@@ -230,7 +230,7 @@ html[lang="en"] .font-serif-editorial {
 }
 .rx-card:hover {
   border-color: var(--accent-border);
-  box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--accent) 18%, transparent);
+  box-shadow: 0 10px 24px -8px var(--accent-border);
   transform: translateY(-2px);
 }
 
@@ -246,7 +246,7 @@ html[lang="en"] .font-serif-editorial {
   background-color: var(--surface);
   border: 1px solid var(--accent-border);
   border-radius: 14px;
-  box-shadow: 0 12px 30px -10px color-mix(in srgb, var(--accent) 16%, rgba(15, 23, 42, 0.08));
+  box-shadow: 0 12px 30px -10px var(--accent-soft);
   transition: border-color 180ms ease, background-color 180ms ease, box-shadow 200ms ease;
 }
 
@@ -261,7 +261,7 @@ html[lang="en"] .font-serif-editorial {
 .rx-btn-primary:hover {
   opacity: 0.93;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 6px 16px -6px var(--accent-border);
 }
 .rx-btn-primary:active {
   transform: translateY(0) scale(0.98);

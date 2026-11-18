@@ -53,12 +53,17 @@ export function saveStoredPref(key: string, value: string): void {
   }
 }
 
-function getContrastInk(hex: string): string {
+function hexToRgbTuple(hex: string): [number, number, number] {
   const clean = hex.replace('#', '')
-  if (clean.length !== 6) return '#FFFFFF'
+  if (clean.length !== 6) return [27, 54, 93]
   const r = Number.parseInt(clean.slice(0, 2), 16)
   const g = Number.parseInt(clean.slice(2, 4), 16)
   const b = Number.parseInt(clean.slice(4, 6), 16)
+  return Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b) ? [r, g, b] : [27, 54, 93]
+}
+
+function getContrastInk(hex: string): string {
+  const [r, g, b] = hexToRgbTuple(hex)
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
   return luminance > 0.62 ? '#0F172A' : '#FFFFFF'
 }
@@ -83,14 +88,15 @@ export function applyThemeAndAccent(theme: ThemeMode, accentKey: AccentPresetKey
     ink = pal.ink
   }
 
+  const [r, g, b] = hexToRgbTuple(accent)
   root.style.setProperty('--accent', accent)
   root.style.setProperty('--accent-ink', ink)
-  root.style.setProperty('--accent-soft', `color-mix(in srgb, ${accent} ${isDark ? '18%' : '10%'}, var(--surface))`)
-  root.style.setProperty('--accent-border', `color-mix(in srgb, ${accent} ${isDark ? '42%' : '30%'}, var(--border))`)
+  root.style.setProperty('--accent-soft', `rgba(${r}, ${g}, ${b}, ${isDark ? 0.18 : 0.10})`)
+  root.style.setProperty('--accent-border', `rgba(${r}, ${g}, ${b}, ${isDark ? 0.42 : 0.28})`)
   root.style.setProperty('--secondary', accent)
-  root.style.setProperty('--secondary-soft', `color-mix(in srgb, ${accent} ${isDark ? '16%' : '9%'}, var(--surface))`)
-  root.style.setProperty('--brass', `color-mix(in srgb, ${accent} 82%, var(--ink))`)
-  root.style.setProperty('--brass-soft', `color-mix(in srgb, ${accent} ${isDark ? '20%' : '13%'}, var(--surface))`)
+  root.style.setProperty('--secondary-soft', `rgba(${r}, ${g}, ${b}, ${isDark ? 0.16 : 0.11})`)
+  root.style.setProperty('--brass', accent)
+  root.style.setProperty('--brass-soft', `rgba(${r}, ${g}, ${b}, ${isDark ? 0.20 : 0.13})`)
 
   const themeMeta = doc.querySelector('meta[name="theme-color"]')
   if (themeMeta) themeMeta.setAttribute('content', accent)

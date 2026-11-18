@@ -62,10 +62,10 @@ function copySummaryCv() {
 </script>
 
 <template>
-  <section class="space-y-12 rx-animate-in">
+  <section class="space-y-12">
     <!-- Editorial Law Chambers Hero with Official Portrait -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch border-b rx-divider pb-10">
-      <div class="lg:col-span-7 flex flex-col justify-between space-y-6 rx-stagger-1">
+      <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
         <div class="space-y-5">
           <div class="flex flex-wrap items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rx-badge-accent">
@@ -135,7 +135,7 @@ function copySummaryCv() {
       </div>
 
       <!-- Official Portrait & Counsel Dossier Card -->
-      <div class="lg:col-span-5 rx-card-double p-5 sm:p-6 flex flex-col justify-between space-y-5 rx-stagger-2">
+      <div class="lg:col-span-5 rx-card-double p-5 sm:p-6 flex flex-col justify-between space-y-5">
         <div class="flex flex-col sm:flex-row items-center gap-4 border-b rx-divider pb-4">
           <div class="w-28 h-32 sm:w-32 sm:h-36 rounded-xl overflow-hidden border-2 border-[var(--accent)] shadow-md shrink-0 bg-[var(--surface-alt)]">
             <img src="/images/alhussein_portrait.webp" :alt="profile.cardName" width="128" height="146" fetchpriority="high" decoding="async" class="w-full h-full object-cover object-top">
