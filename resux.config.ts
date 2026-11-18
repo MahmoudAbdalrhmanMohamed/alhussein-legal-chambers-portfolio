@@ -252,6 +252,7 @@ export default defineResuxConfig({
           content: 'الموقع الرسمي والسيرة الذاتية للأستاذ الحسين محمد عبدالله — باحث قانوني ومحامٍ متدرب، عضو نقابة المحامين المصرية، ليسانس الحقوق جامعة حلوان (2024).'
         },
         { name: 'author', content: 'الحسين محمد عبدالله — Al Hussein Mohamed Abdallah' },
+        { name: 'google-site-verification', content: 'fSLFaGjegny-_ZWDWXEp9G8qtrfkebhJpZe4PvVJjAE' },
         { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' },
         { name: 'geo.region', content: 'EG-GZ' },
         { name: 'geo.placename', content: 'Boulaq El Dakrour, Giza, Egypt' },
