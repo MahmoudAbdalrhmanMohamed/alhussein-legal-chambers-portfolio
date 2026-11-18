@@ -1,0 +1,10 @@
+node_modules
+.resux
+.resux-nitro
+.nitro
+.output
+dist
+standalone-preview
+.env
+.env.*
+!.env.example

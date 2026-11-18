@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #1B365D;
+  --accent-soft: #EFF4FA;
+  --accent-ink: #FFFFFF;
+}
+
+:root[data-theme="light"] {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-alt: #F1F5F9;
+  --surface-elevated: #FFFFFF;
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --ink-subtle: #64748B;
+  --border: #E2E8F0;
+  --secondary: #14532D;
+  --secondary-soft: #ECFDF5;
+  --brass: #854D0E;
+  --brass-soft: #FEF9C3;
+  --code-bg: #0F172A;
+  --code-ink: #F1F5F9;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0B0F17;
+  --surface: #111827;
+  --surface-alt: #1E293B;
+  --surface-elevated: #1E293B;
+  --ink: #F8FAFC;
+  --ink-muted: #94A3B8;
+  --ink-subtle: #64748B;
+  --border: #1E293B;
+  --secondary: #34D399;
+  --secondary-soft: rgba(52, 211, 153, 0.14);
+  --brass: #FBBF24;
+  --brass-soft: rgba(251, 191, 36, 0.14);
+  --code-bg: #030712;
+  --code-ink: #E2E8F0;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--ink);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+html[lang="ar"] body {
+  font-family: var(--font-ar-body), 'IBM Plex Sans Arabic', sans-serif;
+  line-height: 1.72;
+}
+
+html[lang="en"] body {
+  font-family: var(--font-en-body), 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.62;
+}
+
+.ltr-num {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}

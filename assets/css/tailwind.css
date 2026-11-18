@@ -1,0 +1,400 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   DYNAMIC EXECUTIVE PALETTE — ALL ACCENTS REACT TO ACTIVE COLOR CHOICE
+   ===================================================================== */
+:root {
+  --accent: #1B365D;
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface, #FFFFFF));
+  --accent-border: color-mix(in srgb, var(--accent) 32%, var(--border, #E2E8F0));
+  --accent-ink: #FFFFFF;
+  --secondary: var(--accent);
+  --secondary-soft: color-mix(in srgb, var(--accent) 12%, var(--surface, #FFFFFF));
+  --brass: color-mix(in srgb, var(--accent) 82%, var(--ink, #0F172A));
+  --brass-soft: color-mix(in srgb, var(--accent) 14%, var(--surface, #FFFFFF));
+}
+
+:root[data-theme="light"], :root[data-theme="parchment"] {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-alt: #F1F5F9;
+  --surface-elevated: #FFFFFF;
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --ink-subtle: #64748B;
+  --border: #E2E8F0;
+  --border-strong: #0F172A;
+  --code-bg: #0F172A;
+  --code-ink: #F1F5F9;
+}
+
+:root[data-theme="dark"], :root[data-theme="walnut"] {
+  --bg: #0B0F17;
+  --surface: #111827;
+  --surface-alt: #1E293B;
+  --surface-elevated: #1E293B;
+  --ink: #F8FAFC;
+  --ink-muted: #94A3B8;
+  --ink-subtle: #64748B;
+  --border: #1E293B;
+  --border-strong: #F8FAFC;
+  --code-bg: #030712;
+  --code-ink: #E2E8F0;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* =====================================================================
+   CUSTOM ACCENT-AWARE SCROLLBAR
+   ===================================================================== */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  border-radius: 9999px;
+  border: 2px solid var(--bg);
+  transition: background-color 180ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+}
+
+.rx-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.rx-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 220ms ease, color 220ms ease;
+  overflow-x: hidden;
+  accent-color: var(--accent);
+}
+
+html[lang="ar"] body {
+  font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.72;
+}
+
+html[lang="en"] body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.62;
+}
+
+html[lang="ar"] .font-serif-editorial {
+  font-family: 'Readex Pro', 'IBM Plex Sans Arabic', sans-serif;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+}
+
+html[lang="en"] .font-serif-editorial {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.ltr-num {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* =====================================================================
+   NATIVE VIEW TRANSITIONS & SMOOTH ENTRANCE ANIMATIONS
+   ===================================================================== */
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes rxFadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes rxFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rxModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rxBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+::view-transition-old(root) {
+  animation: 180ms cubic-bezier(0.4, 0, 1, 1) both rxFadeSlideOut;
+}
+
+::view-transition-new(root) {
+  animation: 260ms cubic-bezier(0.16, 1, 0.3, 1) both rxFadeSlideIn;
+}
+
+.rx-animate-in {
+  animation: rxFadeSlideIn 340ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.rx-stagger-1 {
+  animation: rxFadeSlideIn 360ms cubic-bezier(0.16, 1, 0.3, 1) 50ms both;
+}
+
+.rx-stagger-2 {
+  animation: rxFadeSlideIn 380ms cubic-bezier(0.16, 1, 0.3, 1) 110ms both;
+}
+
+.rx-stagger-3 {
+  animation: rxFadeSlideIn 400ms cubic-bezier(0.16, 1, 0.3, 1) 170ms both;
+}
+
+.rx-modal-backdrop {
+  animation: rxBackdropIn 180ms ease both;
+}
+
+.rx-modal-panel {
+  animation: rxModalIn 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.rx-accordion-body {
+  animation: rxFadeSlideIn 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Crisp White Executive Cards */
+.rx-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rx-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--accent) 18%, transparent);
+  transform: translateY(-2px);
+}
+
+.rx-card-static {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.rx-card-double {
+  background-color: var(--surface);
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px -10px color-mix(in srgb, var(--accent) 16%, rgba(15, 23, 42, 0.08));
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 200ms ease;
+}
+
+/* Buttons */
+.rx-btn-primary {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  transition: background-color 160ms ease, border-color 160ms ease, opacity 160ms ease, transform 160ms ease, box-shadow 180ms ease;
+}
+.rx-btn-primary:hover {
+  opacity: 0.93;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.rx-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.rx-btn-accent {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  transition: background-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+.rx-btn-accent:hover {
+  opacity: 0.93;
+  transform: translateY(-1px);
+}
+.rx-btn-accent:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.rx-btn-outline {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+.rx-btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: var(--accent-soft);
+  transform: translateY(-1px);
+}
+.rx-btn-outline:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Badges — ALL dynamically derived from --accent */
+.rx-badge {
+  background-color: var(--surface-alt);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+.rx-badge-accent {
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 7px;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+.rx-badge-secondary {
+  background-color: var(--secondary-soft);
+  color: var(--secondary);
+  border: 1px solid var(--accent-border);
+  border-radius: 7px;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+.rx-badge-brass {
+  background-color: var(--brass-soft);
+  color: var(--brass);
+  border: 1px solid var(--accent-border);
+  border-radius: 7px;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+
+/* Inputs */
+.rx-input {
+  background-color: var(--surface-elevated);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.rx-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.rx-divider {
+  border-color: var(--border);
+}
+
+/* Desktop Nav Pill & Active Indicator */
+.rx-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.48rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  border-radius: 8px;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 140ms ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.rx-nav-pill:hover {
+  color: var(--ink);
+  background-color: var(--surface-alt);
+}
+.rx-nav-pill.rx-nav-active {
+  color: var(--accent);
+  background-color: var(--accent-soft);
+  border-color: var(--accent-border);
+  font-weight: 700;
+}
+
+/* Accent Color Swatch Dot */
+.swatch-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms ease, border-color 160ms ease;
+}
+.swatch-dot:hover {
+  transform: scale(1.14);
+}
+.swatch-dot.active-swatch {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px var(--surface);
+  transform: scale(1.14);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+}

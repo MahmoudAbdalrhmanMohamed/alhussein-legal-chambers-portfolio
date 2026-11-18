@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Al Hussein Legal Chambers Emblem">
+  <defs>
+    <linearGradient id="chambersBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E3A64" />
+      <stop offset="100%" stop-color="#0E1E36" />
+    </linearGradient>
+    <linearGradient id="goldAccent" x1="16" y1="12" x2="48" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F2D99B" />
+      <stop offset="100%" stop-color="#C89F4C" />
+    </linearGradient>
+  </defs>
+
+  <!-- Judicial Navy Crest -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#chambersBg)" />
+  <rect x="6" y="6" width="52" height="52" rx="10" fill="none" stroke="url(#goldAccent)" stroke-opacity="0.55" stroke-width="1.5" />
+
+  <!-- Scales of Justice -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top finial & central pillar -->
+    <circle cx="32" cy="15" r="2.4" fill="url(#goldAccent)" />
+    <line x1="32" y1="17.5" x2="32" y2="47" stroke="#F8FAFC" stroke-width="2.6" />
+
+    <!-- Balance beam -->
+    <line x1="16" y1="22.5" x2="48" y2="22.5" stroke="url(#goldAccent)" stroke-width="2.6" />
+
+    <!-- Left pan chains & bowl -->
+    <path d="M18 22.5 L13.5 34.5 M18 22.5 L22.5 34.5" stroke="#E2E8F0" stroke-width="1.6" />
+    <path d="M12 34.5 C12 38.2 14.7 40.5 18 40.5 C21.3 40.5 24 38.2 24 34.5 Z" fill="#F8FAFC" stroke="#F8FAFC" stroke-width="1.2" />
+
+    <!-- Right pan chains & bowl -->
+    <path d="M46 22.5 L41.5 34.5 M46 22.5 L50.5 34.5" stroke="#E2E8F0" stroke-width="1.6" />
+    <path d="M40 34.5 C40 38.2 42.7 40.5 46 40.5 C49.3 40.5 52 38.2 52 34.5 Z" fill="#F8FAFC" stroke="#F8FAFC" stroke-width="1.2" />
+
+    <!-- Pedestal base -->
+    <line x1="23" y1="47.5" x2="41" y2="47.5" stroke="url(#goldAccent)" stroke-width="2.8" />
+    <line x1="20" y1="51" x2="44" y2="51" stroke="#F8FAFC" stroke-width="2.4" />
+  </g>
+</svg>

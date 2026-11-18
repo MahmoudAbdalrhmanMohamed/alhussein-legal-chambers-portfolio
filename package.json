@@ -1,0 +1,27 @@
+{
+  "name": "alhussein-legal-portfolio-resux",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bilingual (Arabic RTL & English LTR) Legal Chambers Portfolio for Al Hussein Mohamed Abdallah built with resuxjs@0.4.0-beta.7",
+  "scripts": {
+    "dev": "resux dev",
+    "build": "resux build",
+    "start": "resux start",
+    "preview": "resux preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "resuxjs": "0.4.0-beta.7",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.18",
+    "autoprefixer": "^10.4.20",
+    "fontaine": "^1.0.3",
+    "fontless": "^1.3.4",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  }
+}
