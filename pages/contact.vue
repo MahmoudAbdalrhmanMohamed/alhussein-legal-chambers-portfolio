@@ -123,14 +123,14 @@ function copyProfileData() {
         
         <!-- Loading Progress Bar -->
         <div
-          v-if="isSubmitting"
+          v-if="isSubmitting.value"
           class="absolute top-0 left-0 right-0 h-1 bg-[var(--accent-soft)] overflow-hidden z-20"
         >
           <div class="w-full h-full bg-[var(--accent)] animate-pulse" />
         </div>
 
         <!-- SUCCESS STATE -->
-        <div v-if="isSuccess && submittedEntry" class="space-y-6 py-4 rx-animate-in">
+        <div v-if="isSuccess.value && submittedEntry.value" class="space-y-6 py-4 rx-animate-in">
           <div class="flex items-start gap-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
             <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,34 +158,34 @@ function copyProfileData() {
                 {{ lang === 'ar' ? 'إشعار استلام رسمي رقم:' : 'Official Dispatch Receipt #:' }}
               </span>
               <span class="font-mono font-bold text-[var(--ink)]">
-                #RX-{{ submittedEntry.id }}
+                #RX-{{ submittedEntry.value.id }}
               </span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'اسم الراسل:' : 'Sender Name:' }}</span>
-                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.senderName }}</span>
+                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.value.senderName }}</span>
               </div>
               <div>
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'البريد الإلكتروني:' : 'Email Address:' }}</span>
-                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.senderEmail }}</span>
+                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.value.senderEmail }}</span>
               </div>
-              <div v-if="submittedEntry.senderPhone">
+              <div v-if="submittedEntry.value.senderPhone">
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'الهاتف / واتساب:' : 'Phone / WhatsApp:' }}</span>
-                <span class="font-semibold text-[var(--ink)]" dir="ltr">{{ submittedEntry.senderPhone }}</span>
+                <span class="font-semibold text-[var(--ink)]" dir="ltr">{{ submittedEntry.value.senderPhone }}</span>
               </div>
               <div>
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'القطاع القانوني:' : 'Legal Sector:' }}</span>
-                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.inquiryScope }}</span>
+                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.value.inquiryScope }}</span>
               </div>
-              <div v-if="submittedEntry.attachment" class="sm:col-span-2">
+              <div v-if="submittedEntry.value.attachment" class="sm:col-span-2">
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'الملف المرفق:' : 'Attached File:' }}</span>
                 <span class="font-semibold text-[var(--accent)] inline-flex items-center gap-1.5">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                   </svg>
-                  {{ submittedEntry.attachment.name }}
+                  {{ submittedEntry.value.attachment.name }}
                 </span>
               </div>
             </div>
@@ -228,7 +228,7 @@ function copyProfileData() {
 
           <!-- GLOBAL ERROR ALERT -->
           <div
-            v-if="errorMessage"
+            v-if="errorMessage.value"
             role="alert"
             class="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 space-y-2 rx-animate-in"
           >
@@ -236,7 +236,7 @@ function copyProfileData() {
               <svg class="w-4 h-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{{ errorMessage }}</span>
+              <span>{{ errorMessage.value }}</span>
             </div>
             <div class="text-[11px] pt-1 border-t border-red-500/20 flex flex-wrap items-center gap-2">
               <span>{{ lang === 'ar' ? 'أو يمكنك التواصل مباشرة عبر تطبيق بريدك:' : 'Or send directly via your email client:' }}</span>
@@ -267,13 +267,13 @@ function copyProfileData() {
                   v-model="senderName"
                   type="text"
                   required
-                  :disabled="isSubmitting"
+                  :disabled="isSubmitting.value"
                   :placeholder="lang === 'ar' ? 'مثال: مكتب محاماة أو الإدارة القانونية بشركة...' : 'Managing Partner / Law Firm'"
                   class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.senderName }"
+                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.value && fieldErrors.value.senderName }"
                 >
-                <p v-if="fieldErrors.senderName" class="text-xs text-red-600 font-semibold mt-1">
-                  {{ fieldErrors.senderName }}
+                <p v-if="fieldErrors.value && fieldErrors.value.senderName" class="text-xs text-red-600 font-semibold mt-1">
+                  {{ fieldErrors.value.senderName }}
                 </p>
               </div>
 
@@ -287,13 +287,13 @@ function copyProfileData() {
                   v-model="senderEmail"
                   type="email"
                   required
-                  :disabled="isSubmitting"
+                  :disabled="isSubmitting.value"
                   :placeholder="lang === 'ar' ? 'example@lawfirm.com' : 'counsel@lawfirm.com'"
                   class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.senderEmail }"
+                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.value && fieldErrors.value.senderEmail }"
                 >
-                <p v-if="fieldErrors.senderEmail" class="text-xs text-red-600 font-semibold mt-1">
-                  {{ fieldErrors.senderEmail }}
+                <p v-if="fieldErrors.value && fieldErrors.value.senderEmail" class="text-xs text-red-600 font-semibold mt-1">
+                  {{ fieldErrors.value.senderEmail }}
                 </p>
               </div>
             </div>
@@ -307,7 +307,7 @@ function copyProfileData() {
                 id="input-sender-phone"
                 v-model="senderPhone"
                 type="tel"
-                :disabled="isSubmitting"
+                :disabled="isSubmitting.value"
                 :placeholder="lang === 'ar' ? '010XXXXXXXX أو +2010XXXXXXXX' : '+20 10X XXX XXXX'"
                 class="rx-input w-full px-3 py-2.5 text-sm"
                 dir="ltr"
@@ -325,9 +325,9 @@ function copyProfileData() {
               <ChambersSelect
                 id="input-inquiry-scope"
                 v-model="selectedScopeId"
-                :options="scopes"
-                :disabled="isSubmitting"
-                :locale="lang"
+                :options="scopes.value"
+                :disabled="isSubmitting.value"
+                :locale="lang.value"
               />
             </div>
 
@@ -336,8 +336,8 @@ function copyProfileData() {
               :model-value="attachedFile"
               :file-info="attachedFileInfo"
               :error-message="fileError"
-              :disabled="isSubmitting"
-              :locale="lang"
+              :disabled="isSubmitting.value"
+              :locale="lang.value"
               @file-selected="onFileSelected"
               @file-removed="onFileRemoved"
             />
@@ -353,13 +353,13 @@ function copyProfileData() {
                 v-model="message"
                 rows="4"
                 required
-                :disabled="isSubmitting"
+                :disabled="isSubmitting.value"
                 :placeholder="lang === 'ar' ? 'يرجى كتابة تفاصيل الوظيفة، موضوع الاستشارة، أو الموعد المقترح للمقابلة...' : 'Share role details, legal mandate, or preferred interview schedule...'"
                 class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.message }"
+                :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.value && fieldErrors.value.message }"
               />
-              <p v-if="fieldErrors.message" class="text-xs text-red-600 font-semibold mt-1">
-                {{ fieldErrors.message }}
+              <p v-if="fieldErrors.value && fieldErrors.value.message" class="text-xs text-red-600 font-semibold mt-1">
+                {{ fieldErrors.value.message }}
               </p>
             </div>
 
@@ -367,12 +367,12 @@ function copyProfileData() {
             <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t rx-divider">
               <button
                 type="submit"
-                :disabled="isSubmitting"
+                :disabled="isSubmitting.value"
                 class="px-6 py-2.5 text-sm font-bold rx-btn-primary flex items-center justify-center gap-2 min-w-[180px] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
               >
                 <!-- Animated Spinner during loading -->
                 <svg
-                  v-if="isSubmitting"
+                  v-if="isSubmitting.value"
                   class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -382,7 +382,7 @@ function copyProfileData() {
                 </svg>
 
                 <span>
-                  {{ isSubmitting
+                  {{ isSubmitting.value
                     ? (lang === 'ar' ? 'جارٍ إرسال الرسالة...' : 'Dispatching Inquiry...')
                     : (lang === 'ar' ? 'إرسال الرسالة والتكليف القانوني ←' : 'Send Legal Inquiry →') }}
                 </span>

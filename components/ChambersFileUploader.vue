@@ -1,22 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { AttachmentInfo } from '../composables/useContactForm'
+import { ref, computed } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: File | null
-    fileInfo?: AttachmentInfo | null
-    errorMessage?: string | null
-    disabled?: boolean
-    locale?: 'ar' | 'en'
-  }>(),
-  {
-    fileInfo: null,
-    errorMessage: null,
-    disabled: false,
-    locale: 'ar'
-  }
-)
+const props = defineProps<{
+  modelValue: any
+  fileInfo?: any
+  errorMessage?: string | null
+  disabled?: boolean
+  locale?: string
+}>()
 
 const emit = defineEmits<{
   'file-selected': [file: File]
@@ -25,6 +16,29 @@ const emit = defineEmits<{
 
 const fileInputRef = ref<any>(null)
 const isDragging = ref(false)
+
+const isFileSelected = computed(() => {
+  const f: any = props.modelValue
+  if (!f) return false
+  return Boolean(f.value !== undefined ? f.value : f)
+})
+
+const currentInfo = computed(() => {
+  const fi: any = props.fileInfo
+  if (!fi) return null
+  return fi.value !== undefined ? fi.value : fi
+})
+
+const currentError = computed(() => {
+  const err: any = props.errorMessage
+  if (!err) return null
+  return err.value !== undefined ? err.value : err
+})
+
+const activeLocale = computed(() => {
+  const l: any = props.locale
+  return (l && l.value !== undefined ? l.value : l) || 'ar'
+})
 
 function triggerFileInput() {
   fileInputRef.value?.click()
@@ -76,7 +90,7 @@ function formatSize(bytes: number): string {
 <template>
   <div class="space-y-2">
     <label class="block text-xs font-bold text-[var(--ink)]">
-      {{ locale === 'ar' ? 'إرفاق مستند أو أوراق قانونية (اختياري)' : 'Attach Document or Legal Papers (Optional)' }}
+      {{ activeLocale === 'ar' ? 'إرفاق مستند أو أوراق قانونية (اختياري)' : 'Attach Document or Legal Papers (Optional)' }}
     </label>
 
     <!-- Hidden Native File Input -->
@@ -91,7 +105,7 @@ function formatSize(bytes: number): string {
 
     <!-- Uploaded State -->
     <div
-      v-if="modelValue && fileInfo"
+      v-if="isFileSelected && currentInfo"
       class="flex items-center justify-between gap-3 p-3 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] shadow-sm rx-animate-in"
     >
       <div class="flex items-center gap-3 min-w-0">
@@ -101,11 +115,11 @@ function formatSize(bytes: number): string {
           </svg>
         </div>
         <div class="truncate text-start">
-          <div class="text-xs font-bold truncate text-[var(--ink)]" :title="fileInfo.name">
-            {{ fileInfo.name }}
+          <div class="text-xs font-bold truncate text-[var(--ink)]" :title="currentInfo.name">
+            {{ currentInfo.name }}
           </div>
           <div class="text-[11px] text-[var(--ink-muted)]">
-            {{ formatSize(fileInfo.size) }} • {{ locale === 'ar' ? 'جاهز للإرسال' : 'Ready to dispatch' }}
+            {{ formatSize(currentInfo.size) }} • {{ activeLocale === 'ar' ? 'جاهز للإرسال' : 'Ready to dispatch' }}
           </div>
         </div>
       </div>
@@ -114,13 +128,13 @@ function formatSize(bytes: number): string {
         type="button"
         :disabled="disabled"
         class="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-red-600 hover:bg-red-500/10 transition-colors shrink-0"
-        :title="locale === 'ar' ? 'إزالة الملف المرفق' : 'Remove attached file'"
+        :title="activeLocale === 'ar' ? 'إزالة الملف المرفق' : 'Remove attached file'"
         @click="removeFile"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <span class="sr-only">{{ locale === 'ar' ? 'إزالة الملف' : 'Remove file' }}</span>
+        <span class="sr-only">{{ activeLocale === 'ar' ? 'إزالة الملف' : 'Remove file' }}</span>
       </button>
     </div>
 
@@ -131,7 +145,7 @@ function formatSize(bytes: number): string {
       :class="[
         isDragging
           ? 'border-[var(--accent)] bg-[var(--accent-soft)] scale-[1.01]'
-          : errorMessage
+          : currentError
             ? 'border-red-400 bg-red-50/20'
             : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
         disabled ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''
@@ -153,17 +167,17 @@ function formatSize(bytes: number): string {
         </div>
 
         <div class="text-xs font-semibold text-[var(--ink)]">
-          {{ locale === 'ar' ? 'اسحب المستند هنا أو اضغط للاختيار' : 'Drag file here or click to browse' }}
+          {{ activeLocale === 'ar' ? 'اسحب المستند هنا أو اضغط للاختيار' : 'Drag file here or click to browse' }}
         </div>
 
         <div class="text-[11px] text-[var(--ink-muted)]">
-          {{ locale === 'ar' ? 'صيغ PDF، Word، أو صور (الحد الأقصى 10 ميجابايت)' : 'PDF, Word, or images (Max 10 MB)' }}
+          {{ activeLocale === 'ar' ? 'صيغ PDF، Word، أو صور (الحد الأقصى 10 ميجابايت)' : 'PDF, Word, or images (Max 10 MB)' }}
         </div>
       </div>
     </div>
 
     <!-- Error Message -->
-    <div v-if="errorMessage" class="text-xs font-semibold text-red-600 flex items-center gap-1.5 rx-animate-in">
+    <div v-if="currentError" class="text-xs font-semibold text-red-600 flex items-center gap-1.5 rx-animate-in">
       <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>

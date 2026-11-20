@@ -196,7 +196,7 @@ export default defineResuxConfig({
       {
         autoScan: false,
         preconnect: true,
-        strategy: 'preload',
+        strategy: 'lazy',
         families: [
           {
             name: 'IBM Plex Sans Arabic',
@@ -224,7 +224,6 @@ export default defineResuxConfig({
             provider: 'google',
             weights: [400, 600],
             display: 'swap',
-            strategy: 'lazy',
             fallbacks: ['Courier New']
           }
         ]

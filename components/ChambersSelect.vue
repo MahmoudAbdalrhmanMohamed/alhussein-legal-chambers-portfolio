@@ -1,38 +1,40 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import type { ScopeOption } from '../composables/useContactForm'
+import { ref, computed } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    options: ScopeOption[]
-    disabled?: boolean
-    id?: string
-    locale?: 'ar' | 'en'
-    hasError?: boolean
-  }>(),
-  {
-    disabled: false,
-    id: 'chambers-select',
-    locale: 'ar',
-    hasError: false
-  }
-)
+const props = defineProps<{
+  modelValue: string
+  options: any[]
+  disabled?: boolean
+  id?: string
+  locale?: string
+  hasError?: boolean
+}>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
 const isOpen = ref(false)
-const containerRef = ref<any>(null)
 const focusedIndex = ref(0)
 
-const optionsList = computed(() => props.options || [])
-const currentVal = computed(() => props.modelValue)
+const optionsList = computed(() => {
+  const o: any = props.options
+  if (!o) return []
+  if (Array.isArray(o)) return o
+  if (Array.isArray(o.value)) return o.value
+  return []
+})
+const currentVal = computed(() => {
+  const v: any = props.modelValue
+  if (v && typeof v === 'object' && 'value' in v) return v.value
+  return v
+})
 const optionsCount = computed(() => optionsList.value.length)
 
 const selectedOption = computed(() => {
-  return optionsList.value.find((o) => o.id === currentVal.value) || optionsList.value[0]
+  const list = optionsList.value
+  if (!list.length) return null
+  return list.find((o: any) => o && o.id === currentVal.value) || list[0]
 })
 
 function toggleDropdown() {
@@ -93,30 +95,17 @@ function handleKeyDown(e: any) {
     }
   }
 }
-
-function handleClickOutside(event: any) {
-  if (!containerRef.value) return
-  const target = event.target as Node
-  if (!containerRef.value.contains(target)) {
-    closeDropdown()
-  }
-}
-
-onMounted(() => {
-  if (typeof window !== 'undefined') {
-    window.addEventListener('pointerdown', handleClickOutside)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('pointerdown', handleClickOutside)
-  }
-})
 </script>
 
 <template>
-  <div ref="containerRef" class="relative w-full text-start" @keydown="handleKeyDown">
+  <div class="relative w-full text-start" @keydown="handleKeyDown">
+    <!-- Transparent backdrop to dismiss on click outside -->
+    <div
+      v-if="isOpen"
+      class="fixed inset-0 z-40 bg-transparent cursor-default"
+      aria-hidden="true"
+      @click="closeDropdown"
+    />
     <!-- Trigger Button -->
     <button
       :id="id"
@@ -239,13 +228,13 @@ onBeforeUnmount(() => {
       tabindex="-1"
     >
       <div
-        v-for="(option, idx) in options"
+        v-for="(option, idx) in optionsList"
         :key="option.id"
         role="option"
-        :aria-selected="option.id === modelValue"
+        :aria-selected="option.id === currentVal"
         class="flex items-center justify-between gap-3 p-2.5 rounded-lg cursor-pointer transition-colors"
         :class="[
-          option.id === modelValue
+          option.id === currentVal
             ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold'
             : idx === focusedIndex
               ? 'bg-[var(--surface-alt)] text-[var(--ink)]'
@@ -257,7 +246,7 @@ onBeforeUnmount(() => {
         <div class="flex items-center gap-3 min-w-0">
           <div
             class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs"
-            :class="option.id === modelValue ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface)] text-[var(--ink-muted)] border border-[var(--border)]'"
+            :class="option.id === currentVal ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface)] text-[var(--ink-muted)] border border-[var(--border)]'"
           >
             <!-- Briefcase -->
             <svg v-if="option.icon === 'briefcase'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,7 +288,7 @@ onBeforeUnmount(() => {
 
         <!-- Checkmark if selected -->
         <svg
-          v-if="option.id === modelValue"
+          v-if="option.id === currentVal"
           class="w-4 h-4 text-[var(--accent)] shrink-0"
           fill="none"
           stroke="currentColor"
