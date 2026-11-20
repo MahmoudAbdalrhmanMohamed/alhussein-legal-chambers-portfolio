@@ -657,6 +657,7 @@ function onMobileQuickIndexClick() {
             </p>
             <div class="flex items-center justify-center gap-2 pt-1">
               <button
+                id="btn-cmd-clear-empty"
                 type="button"
                 class="px-3.5 py-1.5 text-xs font-semibold rx-btn-outline rounded-lg cursor-pointer"
                 @click="onCmdClearSearch"
@@ -665,6 +666,7 @@ function onMobileQuickIndexClick() {
               </button>
               <button
                 v-if="activeCategory !== 'ALL'"
+                id="btn-cmd-show-all"
                 type="button"
                 class="px-3.5 py-1.5 text-xs font-semibold rx-btn-primary rounded-lg cursor-pointer"
                 @click="onCmdSelectCat('ALL')"
