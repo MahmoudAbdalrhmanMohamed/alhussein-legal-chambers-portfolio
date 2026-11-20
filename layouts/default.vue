@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { HUSSEIN_DATA } from '../composables/portfolioContent'
+import { useQuickIndex } from '../composables/useQuickIndex'
 import {
   ACCENT_PRESETS,
   STORAGE_KEYS,
@@ -63,7 +64,7 @@ const theme = ref<'light' | 'dark'>('light')
 const accentKey = ref<'navy' | 'emerald' | 'burgundy' | 'slate' | 'custom'>('navy')
 const customHex = ref('#1B365D')
 const mobileDrawerOpen = ref(false)
-const commandModalOpen = ref(false)
+const { open: openQuickIndex, close: closeQuickIndex } = useQuickIndex(lang as any)
 
 function selectAccent(nextKey: 'navy' | 'emerald' | 'burgundy' | 'slate') {
   accentKey.value = nextKey
@@ -114,17 +115,16 @@ function closeMobileMenu() {
 }
 
 function openCommandModal() {
-  commandModalOpen.value = true
+  openQuickIndex()
 }
 
 function closeCommandModal() {
-  commandModalOpen.value = false
+  closeQuickIndex()
 }
 
-function onCmdBackdropClick(event: any) {
-  if (event && event.target === event.currentTarget) {
-    commandModalOpen.value = false
-  }
+function onMobileQuickIndexClick() {
+  closeMobileMenu()
+  openCommandModal()
 }
 </script>
 
@@ -225,12 +225,13 @@ function onCmdBackdropClick(event: any) {
           <button
             id="btn-cmd-open"
             type="button"
-            class="px-3 py-1.5 text-xs font-semibold rx-btn-outline hidden md:inline-flex items-center gap-2"
+            class="px-3 py-1.5 text-xs font-semibold rx-btn-outline inline-flex items-center gap-2 hover:border-[var(--accent)] transition-colors cursor-pointer"
+            :title="lang === 'ar' ? 'فتح الفهرس السريع والبحث (⌘K)' : 'Open Quick Index & Search (⌘K)'"
             @click="openCommandModal"
           >
             <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
             <span>{{ profile.cmdLabel }}</span>
-            <kbd class="px-1.5 py-0.5 bg-[var(--surface-alt)] border rx-divider text-[10px] font-mono-code text-[var(--ink-muted)] rounded leading-none">⌘K</kbd>
+            <kbd class="hidden sm:inline px-1.5 py-0.5 bg-[var(--surface-alt)] border rx-divider text-[10px] font-mono-code text-[var(--ink-muted)] rounded leading-none">⌘K</kbd>
           </button>
         </div>
       </div>
@@ -330,6 +331,17 @@ function onCmdBackdropClick(event: any) {
 
         <!-- Mobile Drawer -->
         <div v-if="mobileDrawerOpen" id="mobile-nav-drawer" class="lg:hidden border-t rx-divider py-3 rx-accordion-body">
+          <button
+            type="button"
+            class="w-full text-start px-3.5 py-2.5 text-xs font-bold rx-btn-primary flex items-center justify-between mb-2 shadow-sm rounded-xl cursor-pointer"
+            @click="onMobileQuickIndexClick"
+          >
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <span>{{ lang === 'ar' ? 'الفهرس القانوني السريع والبحث' : 'Quick Legal Index & Search' }}</span>
+            </span>
+            <kbd class="font-mono-code text-[10px] px-1.5 py-0.5 rounded bg-black/20 text-white">⌘K</kbd>
+          </button>
           <div class="grid grid-cols-2 gap-2">
             <ResuxLink :to="overviewHref" view-transition :class="cleanPath === '/' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[0] }}</ResuxLink>
             <ResuxLink :to="officesHref" view-transition :class="cleanPath === '/offices' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[1] }}</ResuxLink>
@@ -347,63 +359,8 @@ function onCmdBackdropClick(event: any) {
       <slot />
     </main>
 
-    <!-- Fully Localized Command Palette Modal -->
-    <div
-      v-if="commandModalOpen"
-      id="rx-cmd-modal"
-      class="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-xs pt-20 p-4 rx-modal-backdrop"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="lang === 'ar' ? 'الفهرس السريع' : 'Quick Index'"
-      @click="onCmdBackdropClick"
-    >
-      <div class="rx-card-static max-w-lg w-full p-5 space-y-3 shadow-2xl rx-modal-panel">
-        <div class="flex items-center justify-between border-b rx-divider pb-3">
-          <span class="text-sm font-bold text-[var(--ink)]">
-            {{ lang === 'ar' ? 'الفهرس السريع للموقع' : 'Quick Navigation Index' }}
-          </span>
-          <button id="btn-cmd-close" type="button" class="text-xs font-semibold px-2.5 py-1 rx-btn-outline" @click="closeCommandModal">
-            {{ lang === 'ar' ? 'إغلاق' : 'Close' }}
-          </button>
-        </div>
-        <div class="space-y-1 text-xs">
-          <ResuxLink :to="overviewHref" view-transition class="w-full text-start px-3 py-2.5 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-            <span>{{ profile.nav[0] }}</span>
-            <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'الصفحة الرئيسية' : 'Home' }}</span>
-          </ResuxLink>
-          <ResuxLink :to="officesHref" view-transition class="w-full text-start px-3 py-2.5 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-            <span>{{ profile.nav[1] }}</span>
-            <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? '٤ مكاتب محاماة' : '4 Law Offices' }}</span>
-          </ResuxLink>
-          <ResuxLink :to="proceduresHref" view-transition class="w-full text-start px-3 py-2.5 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-            <span>{{ profile.nav[2] }}</span>
-            <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'خطوات ومستندات التقاضي' : 'Steps & Documents' }}</span>
-          </ResuxLink>
-          <ResuxLink :to="faqHref" view-transition class="w-full text-start px-3 py-2.5 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-            <span>{{ profile.nav[3] }}</span>
-            <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'المحاكم والأسئلة الشائعة' : 'Courts & Answers' }}</span>
-          </ResuxLink>
-          <ResuxLink :to="cvHref" view-transition class="w-full text-start px-3 py-2.5 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-            <span>{{ profile.nav[4] }}</span>
-            <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'معاينة وتحميل الملف' : 'PDF Preview & Download' }}</span>
-          </ResuxLink>
-          <ResuxLink :to="contactHref" view-transition class="w-full text-start px-3 py-2.5 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-            <span>{{ profile.nav[5] }}</span>
-            <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'إرسال رسالة مباشرة' : 'Send Inquiry' }}</span>
-          </ResuxLink>
-          <div class="border-t rx-divider my-2 pt-2 space-y-1">
-            <ResuxLink :to="switchLangHref" view-transition class="w-full text-start px-3 py-2 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="closeCommandModal">
-              <span>{{ lang === 'ar' ? 'التبديل إلى اللغة الإنجليزية' : 'Switch to Arabic' }}</span>
-              <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'English' : 'العربية' }}</span>
-            </ResuxLink>
-            <button type="button" class="w-full text-start px-3 py-2 rounded-lg hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex justify-between items-center font-semibold transition-colors" @click="toggleTheme">
-              <span>{{ lang === 'ar' ? 'تبديل المظهر (فاتح / داكن)' : 'Toggle Light / Dark Theme' }}</span>
-              <span class="text-[11px] text-[var(--ink-subtle)]">{{ lang === 'ar' ? 'المظهر' : 'Theme' }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Advanced Searchable Quick Index Modal Component with Shimmer Loading, Error Recovery, and Empty States -->
+    <ChambersQuickIndex :locale="lang" />
 
     <!-- Toast Notification Banner -->
     <div id="rx-toast" class="fixed bottom-5 end-5 z-50 hidden px-4 py-3 rx-card-static border-s-4 border-s-[var(--accent)] text-xs font-bold shadow-lg" role="status" aria-live="polite">
