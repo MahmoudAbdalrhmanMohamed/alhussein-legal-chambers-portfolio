@@ -11,24 +11,21 @@ const activeLocale = computed(() => {
   return (l && l.value !== undefined ? l.value : l) || 'ar'
 })
 
-const {
-  isOpen,
-  searchQuery,
-  activeCategory,
-  isLoading,
-  isError,
-  errorMessage,
-  focusedIndex,
-  filteredItems,
-  resultsCount,
-  isEmpty,
-  close,
-  retry,
-  selectCategory,
-  nextItem,
-  prevItem,
-  selectFocused
-} = useQuickIndex(activeLocale as any)
+const quickIndex = useQuickIndex(activeLocale as any)
+
+const isOpen = computed(() => quickIndex.isOpen.value)
+const searchQuery = computed({
+  get: () => quickIndex.searchQuery.value,
+  set: (val: string) => { quickIndex.searchQuery.value = val }
+})
+const activeCategory = computed(() => quickIndex.activeCategory.value)
+const isLoading = computed(() => quickIndex.isLoading.value)
+const isError = computed(() => quickIndex.isError.value)
+const errorMessage = computed(() => quickIndex.errorMessage.value)
+const focusedIndex = computed(() => quickIndex.focusedIndex.value)
+const filteredItems = computed(() => quickIndex.filteredItems.value)
+const resultsCount = computed(() => quickIndex.resultsCount.value)
+const isEmpty = computed(() => quickIndex.isEmpty.value)
 
 const searchInputRef = ref<HTMLInputElement | null>(null)
 
@@ -46,7 +43,7 @@ watch(isOpen, (val) => {
 
 function onBackdropClick(event: any) {
   if (event && event.target === event.currentTarget) {
-    close()
+    onClose()
   }
 }
 
@@ -57,20 +54,20 @@ function onPanelClick(event: any) {
 }
 
 function onClose() {
-  close()
+  quickIndex.close()
 }
 
 function onRetry() {
-  retry()
+  quickIndex.retry()
 }
 
 function onSearchInput(event: any) {
   const target = event?.target
-  searchQuery.value = target ? target.value : ''
+  quickIndex.searchQuery.value = target ? target.value : ''
 }
 
 function clearSearch() {
-  searchQuery.value = ''
+  quickIndex.searchQuery.value = ''
   if (searchInputRef.value) {
     searchInputRef.value.focus()
   }
@@ -81,7 +78,7 @@ function isSpecialLink(href: string) {
 }
 
 function navigateToItem(href: string) {
-  close()
+  onClose()
   if (typeof window !== 'undefined') {
     if (isSpecialLink(href)) {
       window.location.href = href
@@ -96,25 +93,25 @@ function navigateToItem(href: string) {
 }
 
 function onItemMouseEnter(idx: number) {
-  focusedIndex.value = idx
+  quickIndex.focusedIndex.value = idx
 }
 
 function onSelectCat(cat: 'ALL' | 'pages' | 'offices' | 'dockets' | 'procedures' | 'faq' | 'contact') {
-  selectCategory(cat)
+  quickIndex.selectCategory(cat)
 }
 
 function handleKeyDown(e: any) {
   if (e.key === 'Escape') {
     e.preventDefault()
-    close()
+    onClose()
   } else if (e.key === 'ArrowDown') {
     e.preventDefault()
-    nextItem()
+    quickIndex.nextItem()
   } else if (e.key === 'ArrowUp') {
     e.preventDefault()
-    prevItem()
+    quickIndex.prevItem()
   } else if (e.key === 'Enter') {
-    const item = selectFocused()
+    const item = quickIndex.selectFocused()
     if (item) {
       e.preventDefault()
       navigateToItem(item.href)
