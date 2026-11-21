@@ -2,16 +2,12 @@
 import { ref, computed } from 'vue'
 
 const props = defineProps<{
-  modelValue: string
-  options: any[]
+  modelValue?: string
+  options?: any[]
   disabled?: boolean
   id?: string
   locale?: string
   hasError?: boolean
-}>()
-
-const emit = defineEmits<{
-  'update:modelValue': [value: string]
 }>()
 
 const isOpen = ref(false)
@@ -55,7 +51,6 @@ function closeDropdown() {
 }
 
 function selectOption(id: string) {
-  emit('update:modelValue', id)
   closeDropdown()
 }
 

@@ -9,11 +9,6 @@ const props = defineProps<{
   locale?: string
 }>()
 
-const emit = defineEmits<{
-  'file-selected': [file: File]
-  'file-removed': []
-}>()
-
 const fileInputRef = ref<any>(null)
 const isDragging = ref(false)
 
@@ -46,11 +41,6 @@ function triggerFileInput() {
 
 function onFileChange(event: any) {
   const target: any = event?.target
-  const file = target?.files?.[0]
-  if (file) {
-    emit('file-selected', file)
-  }
-  // Reset input value so re-selecting same file triggers change
   if (target) {
     target.value = ''
   }
@@ -69,14 +59,9 @@ function onDragLeave(event: any) {
 function onDrop(event: any) {
   event?.preventDefault?.()
   isDragging.value = false
-  const file = event?.dataTransfer?.files?.[0]
-  if (file) {
-    emit('file-selected', file)
-  }
 }
 
 function removeFile() {
-  emit('file-removed')
 }
 
 function formatSize(bytes: number): string {

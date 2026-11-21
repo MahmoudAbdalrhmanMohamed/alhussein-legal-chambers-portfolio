@@ -60,6 +60,119 @@ const {
   locale: () => lang.value
 })
 
+// Custom Luxury Select State & Handlers
+const selectOpen = ref(false)
+const focusedOptionIndex = ref(0)
+
+function toggleSelectDropdown() {
+  selectOpen.value = !selectOpen.value
+  if (selectOpen.value) {
+    const list = scopes.value || []
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].id === selectedScopeId.value) {
+        focusedOptionIndex.value = i
+        break
+      }
+    }
+  }
+}
+
+function closeSelectDropdown() {
+  selectOpen.value = false
+}
+
+function chooseScope(id: string) {
+  selectedScopeId.value = id
+  closeSelectDropdown()
+}
+
+function onChooseScope(id: string) {
+  chooseScope(id)
+}
+
+function onOptionMouseEnter(idx: number) {
+  focusedOptionIndex.value = idx
+}
+
+function onRemoveAttachedFile() {
+  removeAttachedFile()
+}
+
+function onSelectKeyDown(e: any) {
+  const list = scopes.value || []
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    closeSelectDropdown()
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    if (!selectOpen.value) {
+      selectOpen.value = true
+    } else {
+      focusedOptionIndex.value = (focusedOptionIndex.value + 1) % list.length
+    }
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    if (!selectOpen.value) {
+      selectOpen.value = true
+    } else {
+      focusedOptionIndex.value = (focusedOptionIndex.value - 1 + list.length) % list.length
+    }
+  } else if (e.key === 'Enter' || e.key === ' ') {
+    if (selectOpen.value) {
+      e.preventDefault()
+      const item = list[focusedOptionIndex.value]
+      if (item) {
+        chooseScope(item.id)
+      }
+    }
+  }
+}
+
+// Custom Luxury File Uploader State & Handlers
+const fileInputEl = ref<any>(null)
+const isDraggingFile = ref(false)
+
+function triggerFileInput() {
+  fileInputEl.value?.click()
+}
+
+function onFileInputChange(event: any) {
+  const target = event?.target
+  const file = target?.files?.[0]
+  if (file) {
+    handleFileUpload(file)
+  }
+  if (target) {
+    target.value = ''
+  }
+}
+
+function onFileDragOver(event: any) {
+  event?.preventDefault?.()
+  isDraggingFile.value = true
+}
+
+function onFileDragLeave(event: any) {
+  event?.preventDefault?.()
+  isDraggingFile.value = false
+}
+
+function onFileDrop(event: any) {
+  event?.preventDefault?.()
+  isDraggingFile.value = false
+  const file = event?.dataTransfer?.files?.[0]
+  if (file) {
+    handleFileUpload(file)
+  }
+}
+
+function formatBytes(bytes?: number): string {
+  if (!bytes) return '0 B'
+  const kb = bytes / 1024
+  if (kb < 1024) return `${kb.toFixed(1)} KB`
+  return `${(kb / 1024).toFixed(1)} MB`
+}
+
 async function onFormSubmit() {
   const success = await submit()
   if (success) {
@@ -73,14 +186,7 @@ async function onFormSubmit() {
 
 function onResetForm() {
   resetForm()
-}
-
-function onFileSelected(file: any) {
-  handleFileUpload(file)
-}
-
-function onFileRemoved() {
-  removeAttachedFile()
+  selectOpen.value = false
 }
 
 function copyCvSummary() {
@@ -119,12 +225,12 @@ function copyProfileData() {
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <!-- Main Contact Form Section -->
-      <div class="lg:col-span-7 rx-card-static p-6 sm:p-8 space-y-5 rx-animate-in rx-stagger-1 relative overflow-hidden">
+      <div class="lg:col-span-7 rx-card-static p-6 sm:p-8 space-y-5 rx-animate-in rx-stagger-1 relative overflow-visible">
         
         <!-- Loading Progress Bar -->
         <div
           v-if="isSubmitting.value"
-          class="absolute top-0 left-0 right-0 h-1 bg-[var(--accent-soft)] overflow-hidden z-20"
+          class="absolute top-0 left-0 right-0 h-1 bg-[var(--accent-soft)] overflow-hidden z-20 rounded-t-2xl"
         >
           <div class="w-full h-full bg-[var(--accent)] animate-pulse" />
         </div>
@@ -195,7 +301,7 @@ function copyProfileData() {
           <div class="flex flex-wrap items-center gap-3 pt-2">
             <button
               type="button"
-              class="px-5 py-2.5 text-xs font-bold rx-btn-primary"
+              class="px-5 py-2.5 text-xs font-bold rx-btn-primary cursor-pointer"
               @click="onResetForm"
             >
               {{ lang === 'ar' ? '+ إرسال رسالة أو استفسار جديد' : '+ Send Another Inquiry' }}
@@ -314,33 +420,294 @@ function copyProfileData() {
               >
             </div>
 
-            <!-- Row 3: Enhanced Custom Legal Sector Select -->
-            <div>
+            <!-- Row 3: Ultra-Luxury Chambers Legal Sector Custom Select -->
+            <div class="relative text-start" @keydown="onSelectKeyDown">
               <label id="label-inquiry-scope" class="block text-xs font-bold mb-1.5 text-[var(--ink)]">
                 {{ lang === 'ar' ? 'نوع التواصل أو القطاع القانوني المستهدف' : 'Inquiry Scope / Target Legal Sector' }}
                 <span class="text-red-500">*</span>
               </label>
-              
-              <!-- Custom Luxury Chambers Select Component -->
-              <ChambersSelect
-                id="input-inquiry-scope"
+
+              <!-- Hidden native select for 100% standard form & autofill compatibility -->
+              <select
+                id="native-scope-select"
                 v-model="selectedScopeId"
-                :options="scopes.value"
-                :disabled="isSubmitting.value"
-                :locale="lang.value"
+                class="sr-only"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <option v-for="opt in scopes.value" :key="opt.id" :value="opt.id">
+                  {{ opt.label }}
+                </option>
+              </select>
+
+              <!-- Transparent backdrop overlay when select is open -->
+              <div
+                v-if="selectOpen"
+                class="fixed inset-0 z-40 bg-black/10 backdrop-blur-[0.5px] cursor-default"
+                aria-hidden="true"
+                @click="closeSelectDropdown"
               />
+
+              <!-- Luxury Select Trigger Button -->
+              <button
+                id="input-inquiry-scope"
+                type="button"
+                role="combobox"
+                :aria-expanded="selectOpen ? 'true' : 'false'"
+                aria-haspopup="listbox"
+                aria-controls="scope-options-listbox"
+                :disabled="isSubmitting.value"
+                class="relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all shadow-xs cursor-pointer z-20"
+                :class="[
+                  selectOpen
+                    ? 'border-[var(--accent)] ring-2 ring-[var(--accent-soft)] bg-[var(--surface-elevated)] shadow-lg'
+                    : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:border-[var(--accent)] hover:shadow-sm',
+                  isSubmitting.value ? 'opacity-60 cursor-not-allowed' : ''
+                ]"
+                @click="toggleSelectDropdown"
+              >
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <!-- Scope Icon Container -->
+                  <div
+                    class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-[var(--accent)] bg-[var(--accent-soft)] shadow-inner transition-colors"
+                  >
+                    <!-- Briefcase -->
+                    <svg v-if="selectedScope.value?.icon === 'briefcase'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <rect width="20" height="14" x="2" y="7" rx="2" stroke-width="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2" />
+                    </svg>
+                    <!-- Building -->
+                    <svg v-else-if="selectedScope.value?.icon === 'building'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <rect width="16" height="20" x="4" y="2" rx="2" stroke-width="2" />
+                      <path d="M9 22v-4h6v4" stroke-width="2" />
+                      <path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" stroke-width="2" />
+                    </svg>
+                    <!-- Scales -->
+                    <svg v-else-if="selectedScope.value?.icon === 'scales'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 7h18M6 7l-3 7h6l-3-7zm12 0l-3 7h6l-3-7z" />
+                    </svg>
+                    <!-- Gavel -->
+                    <svg v-else-if="selectedScope.value?.icon === 'gavel'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 13l-4 4m0 0l-4-4m4 4V3m-4 18h8" />
+                    </svg>
+                    <!-- Shield -->
+                    <svg v-else-if="selectedScope.value?.icon === 'shield'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <!-- Default Chat -->
+                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+
+                  <!-- Text Preview -->
+                  <div class="text-start truncate">
+                    <div class="font-bold text-sm text-[var(--ink)] truncate leading-tight">
+                      {{ selectedScope.value?.label }}
+                    </div>
+                    <div class="text-xs text-[var(--ink-muted)] truncate mt-0.5">
+                      {{ selectedScope.value?.description }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Side Badge & Chevron -->
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold rx-badge-accent">
+                    {{ lang === 'ar' ? 'القطاع المختار' : 'Selected' }}
+                  </span>
+                  <svg
+                    class="w-5 h-5 text-[var(--ink-muted)] transition-transform duration-200 shrink-0"
+                    :class="{ 'rotate-180 text-[var(--accent)]': selectOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              <!-- Luxury Dropdown Popover Panel -->
+              <div
+                v-if="selectOpen"
+                id="scope-options-listbox"
+                role="listbox"
+                aria-label="Legal Sectors"
+                class="absolute start-0 end-0 z-50 mt-2 p-2 rounded-2xl border-2 border-[var(--accent)]/30 bg-[var(--surface-elevated)] shadow-2xl space-y-1 rx-animate-in max-h-96 overflow-y-auto"
+              >
+                <!-- Popover Header -->
+                <div class="px-3 py-2 border-b rx-divider flex items-center justify-between text-xs">
+                  <span class="font-bold text-[var(--ink-muted)]">
+                    {{ lang === 'ar' ? 'اختر القطاع القانوني أو موضوع التكليف القضائي:' : 'Select Target Legal Jurisdiction or Mandate:' }}
+                  </span>
+                  <span class="text-[10px] font-mono-code px-1.5 py-0.5 rounded bg-[var(--surface-alt)] text-[var(--ink-muted)]">
+                    {{ lang === 'ar' ? '6 قطاعات متاحة' : '6 Legal Sectors' }}
+                  </span>
+                </div>
+
+                <!-- Options List -->
+                <button
+                  v-for="(opt, idx) in scopes.value"
+                  :key="opt.id"
+                  type="button"
+                  role="option"
+                  :aria-selected="selectedScopeId === opt.id ? 'true' : 'false'"
+                  class="w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-all cursor-pointer border"
+                  :class="[
+                    selectedScopeId === opt.id
+                      ? 'bg-[var(--accent-soft)] border-[var(--accent)] shadow-xs'
+                      : 'border-transparent hover:border-[var(--border)] hover:bg-[var(--surface-alt)]',
+                    idx === focusedOptionIndex ? 'ring-1 ring-[var(--accent)]' : ''
+                  ]"
+                  @click="onChooseScope(opt.id)"
+                  @mouseenter="onOptionMouseEnter(idx)"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div
+                      class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors"
+                      :class="selectedScopeId === opt.id ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]'"
+                    >
+                      <!-- Briefcase -->
+                      <svg v-if="opt.icon === 'briefcase'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect width="20" height="14" x="2" y="7" rx="2" stroke-width="2" />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2" />
+                      </svg>
+                      <!-- Building -->
+                      <svg v-else-if="opt.icon === 'building'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect width="16" height="20" x="4" y="2" rx="2" stroke-width="2" />
+                        <path d="M9 22v-4h6v4" stroke-width="2" />
+                      </svg>
+                      <!-- Scales -->
+                      <svg v-else-if="opt.icon === 'scales'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 7h18M6 7l-3 7h6l-3-7zm12 0l-3 7h6l-3-7z" />
+                      </svg>
+                      <!-- Gavel -->
+                      <svg v-else-if="opt.icon === 'gavel'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 13l-4 4m0 0l-4-4m4 4V3m-4 18h8" />
+                      </svg>
+                      <!-- Shield -->
+                      <svg v-else-if="opt.icon === 'shield'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      </svg>
+                      <!-- Chat -->
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                    </div>
+
+                    <div class="truncate">
+                      <div class="text-xs sm:text-sm font-bold text-[var(--ink)] truncate">
+                        {{ opt.label }}
+                      </div>
+                      <div class="text-[11px] text-[var(--ink-muted)] truncate mt-0.5">
+                        {{ opt.description }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Active Checkmark Indicator -->
+                  <div v-if="selectedScopeId === opt.id" class="w-6 h-6 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            <!-- Row 4: File Uploader Component -->
-            <ChambersFileUploader
-              :model-value="attachedFile"
-              :file-info="attachedFileInfo"
-              :error-message="fileError"
-              :disabled="isSubmitting.value"
-              :locale="lang.value"
-              @file-selected="onFileSelected"
-              @file-removed="onFileRemoved"
-            />
+            <!-- Row 4: Ultra-Luxury File Uploader Component -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-[var(--ink)]">
+                {{ lang === 'ar' ? 'إرفاق مستند أو أوراق قانونية (اختياري)' : 'Attach Legal Document or Mandate File (Optional)' }}
+              </label>
+
+              <!-- Hidden native file input -->
+              <input
+                ref="fileInputEl"
+                type="file"
+                class="hidden"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
+                :disabled="isSubmitting.value"
+                @change="onFileInputChange"
+              >
+
+              <!-- EMPTY / DROPZONE STATE -->
+              <div
+                v-if="!attachedFileInfo.value"
+                class="border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer"
+                :class="[
+                  isDraggingFile
+                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent-soft)]'
+                    : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
+                  isSubmitting.value ? 'opacity-60 cursor-not-allowed' : ''
+                ]"
+                @click="triggerFileInput"
+                @dragover="onFileDragOver"
+                @dragleave="onFileDragLeave"
+                @drop="onFileDrop"
+              >
+                <div class="w-12 h-12 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center mx-auto mb-3 shadow-inner">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-[var(--ink)] mb-1">
+                  {{ lang === 'ar' ? 'انقر لاختيار ملف أو اسحب الملف وأفلته هنا' : 'Click to select a file or drag & drop here' }}
+                </div>
+                <p class="text-[11px] text-[var(--ink-muted)] max-w-sm mx-auto">
+                  {{ lang === 'ar'
+                    ? 'الملفات المدعومة: PDF، Word (DOCX)، الصور (PNG/JPG/WebP) — بحد أقصى 10 ميجابايت'
+                    : 'Supported: PDF, Word (DOCX), Images (PNG/JPG/WebP) — up to 10 MB' }}
+                </p>
+              </div>
+
+              <!-- SELECTED FILE ATTACHMENT CARD -->
+              <div
+                v-else
+                class="p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/5 flex items-center justify-between gap-3 text-xs rx-animate-in shadow-xs"
+              >
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div class="truncate">
+                    <div class="font-bold text-[var(--ink)] truncate">
+                      {{ attachedFileInfo.value.name }}
+                    </div>
+                    <div class="flex items-center gap-2 text-[11px] text-[var(--ink-muted)] mt-0.5">
+                      <span>{{ formatBytes(attachedFileInfo.value.size) }}</span>
+                      <span>•</span>
+                      <span class="text-emerald-700 dark:text-emerald-400 font-semibold">
+                        {{ lang === 'ar' ? '✓ تم تجهيز الملف للإرفاق' : '✓ Ready to dispatch' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="px-2.5 py-1.5 rounded-lg border border-red-500/30 text-red-600 hover:bg-red-500/10 text-xs font-semibold shrink-0 flex items-center gap-1 transition-colors cursor-pointer"
+                  :title="lang === 'ar' ? 'حذف الملف المرفق' : 'Remove attached file'"
+                  @click="onRemoveAttachedFile"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>{{ lang === 'ar' ? 'حذف' : 'Remove' }}</span>
+                </button>
+              </div>
+
+              <!-- FILE ERROR MESSAGE -->
+              <div v-if="fileError.value" class="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+                <svg class="w-4 h-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ fileError.value }}</span>
+              </div>
+            </div>
 
             <!-- Row 5: Details Textarea -->
             <div>
@@ -368,7 +735,7 @@ function copyProfileData() {
               <button
                 type="submit"
                 :disabled="isSubmitting.value"
-                class="px-6 py-2.5 text-sm font-bold rx-btn-primary flex items-center justify-center gap-2 min-w-[180px] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                class="px-6 py-2.5 text-sm font-bold rx-btn-primary flex items-center justify-center gap-2 min-w-[200px] disabled:opacity-60 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
               >
                 <!-- Animated Spinner during loading -->
                 <svg
@@ -383,12 +750,12 @@ function copyProfileData() {
 
                 <span>
                   {{ isSubmitting.value
-                    ? (lang === 'ar' ? 'جارٍ إرسال الرسالة...' : 'Dispatching Inquiry...')
+                    ? (lang === 'ar' ? 'جارٍ إرسال الرسالة والتكليف...' : 'Dispatching Inquiry...')
                     : (lang === 'ar' ? 'إرسال الرسالة والتكليف القانوني ←' : 'Send Legal Inquiry →') }}
                 </span>
               </button>
 
-              <!-- Optional Direct Email Action -->
+              <!-- Direct Email Action -->
               <a
                 :href="mailtoLink"
                 class="text-xs font-semibold text-[var(--ink-muted)] hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5"
@@ -434,13 +801,13 @@ function copyProfileData() {
               : 'Copy Al Hussein Mohamed Abdallah’s resume summary directly to your clipboard or open the official PDF preview.' }}
           </p>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="px-3.5 py-2 text-xs font-bold rx-btn-primary" @click="copyCvSummary">
+            <button type="button" class="px-3.5 py-2 text-xs font-bold rx-btn-primary cursor-pointer" @click="copyCvSummary">
               {{ lang === 'ar' ? 'نسخ ملخص السيرة الذاتية' : 'Copy Resume Summary' }}
             </button>
             <ResuxLink :to="cvHref" view-transition class="px-3.5 py-2 text-xs font-bold rx-btn-outline inline-flex items-center">
               {{ lang === 'ar' ? 'معاينة السيرة الذاتية' : 'Open PDF Preview' }}
             </ResuxLink>
-            <button type="button" class="px-3.5 py-2 text-xs font-bold rx-btn-outline" @click="copyProfileData">
+            <button type="button" class="px-3.5 py-2 text-xs font-bold rx-btn-outline cursor-pointer" @click="copyProfileData">
               {{ lang === 'ar' ? 'نسخ البيانات المهيكلة' : 'Copy Structured Data' }}
             </button>
           </div>

@@ -34,7 +34,8 @@ const canonicalUrl = lang.value === 'en' ? enAlternateUrl : arAlternateUrl
 useHead({
   link: [
     { rel: 'alternate', type: 'text/plain', title: 'LLMs Dossier', href: `${siteUrl}/llms.txt` },
-    { rel: 'alternate', type: 'application/json', title: 'Structured Legal Dossier API', href: `${siteUrl}/api/dossier` }
+    { rel: 'alternate', type: 'application/json', title: 'Structured Legal Dossier API', href: `${siteUrl}/api/dossier` },
+    { rel: 'modulepreload', href: '/__resux/handlers/m3.mjs' }
   ]
 })
 
@@ -150,6 +151,7 @@ function closeMobileMenu() {
 
 function openCommandModal() {
   commandModalOpen.value = true
+  isLoading.value = false
   focusedIndex.value = 0
 }
 
@@ -174,10 +176,8 @@ function onCmdPanelClick(event: any) {
 
 function onCmdRetry() {
   isError.value = false
-  isLoading.value = true
-  setTimeout(() => {
-    isLoading.value = false
-  }, 60)
+  isLoading.value = false
+  focusedIndex.value = 0
 }
 
 function onCmdClearSearch() {
@@ -678,7 +678,7 @@ function onMobileQuickIndexClick() {
 
           <!-- 4. ACTIVE RESULTS LIST -->
           <div v-else class="space-y-1">
-            <template v-for="(item, idx) in filteredItems" :key="item.id">
+            <div v-for="(item, idx) in filteredItems" :key="item.id" class="contents">
               <!-- External / Direct link (tel, mailto, pdf) -->
               <a
                 v-if="isSpecialCmdLink(item.href)"
@@ -809,7 +809,7 @@ function onMobileQuickIndexClick() {
                   </svg>
                 </div>
               </ResuxLink>
-            </template>
+            </div>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { defineResuxConfig } from 'resuxjs'
+import fontsModule from 'resuxjs/fonts'
 
 const ENV = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env || {}
 const VERCEL_HOST = ENV.VERCEL_ENV === 'production'
@@ -189,6 +190,17 @@ export default defineResuxConfig({
     }
   },
   modules: [
+    [fontsModule, {
+      strategy: 'lazy',
+      deferUntilPageLoad: true,
+      preconnect: true,
+      google: [
+        { name: 'IBM Plex Sans Arabic', weights: [400, 600, 700] },
+        { name: 'Readex Pro', weights: [600, 700] },
+        { name: 'Plus Jakarta Sans', weights: [400, 600, 700] },
+        { name: 'JetBrains Mono', weights: [400, 600] }
+      ]
+    }],
     'resuxjs/i18n',
     'security'
   ],
@@ -205,16 +217,7 @@ export default defineResuxConfig({
     head: {
       title: 'الحسين محمد عبدالله | باحث قانوني ومحامٍ متدرب',
       link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         { rel: 'preconnect', href: 'https://www.googletagmanager.com' },
-        { rel: 'preload', as: 'image', href: '/images/alhussein_portrait.webp', type: 'image/webp', fetchpriority: 'high' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Readex+Pro:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap',
-          media: 'print',
-          onload: "this.media='all'"
-        },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
@@ -254,9 +257,6 @@ export default defineResuxConfig({
       noscript: [
         {
           innerHTML: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NKD7FWZP" height="0" width="0" style="display:none;visibility:hidden"></iframe>`
-        },
-        {
-          innerHTML: `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Readex+Pro:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">`
         }
       ],
       style: [

@@ -26,6 +26,12 @@ useSeoMeta({
   twitterDescription: profile.value.summary
 })
 
+useHead({
+  link: [
+    { rel: 'preload', as: 'image', href: '/images/alhussein_portrait.webp', type: 'image/webp', fetchpriority: 'high' }
+  ]
+})
+
 const officesHref = computed(() => i18n.localePath('/offices'))
 const proceduresHref = computed(() => i18n.localePath('/procedures'))
 const cvHref = computed(() => i18n.localePath('/cv'))
