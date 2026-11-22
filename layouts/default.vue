@@ -196,10 +196,6 @@ function onCmdSearchInput(event: any) {
   focusedIndex.value = 0
 }
 
-function onCmdItemMouseEnter(idx: number) {
-  focusedIndex.value = idx
-}
-
 function isSpecialCmdLink(href: string) {
   return href.startsWith('tel:') || href.startsWith('mailto:') || href.endsWith('.pdf')
 }
@@ -686,20 +682,12 @@ function onMobileQuickIndexClick() {
                 :target="item.href.endsWith('.pdf') ? '_blank' : undefined"
                 rel="noopener"
                 role="option"
-                :aria-selected="idx === focusedIndex"
-                class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer"
-                :class="[
-                  idx === focusedIndex
-                    ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent-border)]'
-                    : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)]'
-                ]"
+                class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)] select-none"
                 @click="closeCommandModal"
-                @mouseenter="onCmdItemMouseEnter(idx)"
               >
                 <div class="flex items-center gap-3 min-w-0">
                   <div
-                    class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs transition-colors shadow-xs"
-                    :class="idx === focusedIndex ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface)] text-[var(--accent)] border border-[var(--border)]'"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs transition-colors shadow-xs bg-[var(--surface)] text-[var(--accent)] border border-[var(--border)] group-hover:bg-[var(--accent)] group-hover:text-white"
                   >
                     <svg v-if="item.icon === 'home'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                     <svg v-else-if="item.icon === 'briefcase'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="7" rx="2" stroke-width="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2" /></svg>
@@ -722,8 +710,7 @@ function onMobileQuickIndexClick() {
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                   <span
-                    class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold"
-                    :class="idx === focusedIndex ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface-alt)] text-[var(--ink-muted)] border border-[var(--border)]'"
+                    class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[var(--surface-alt)] text-[var(--ink-muted)] border border-[var(--border)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]"
                   >
                     {{ item.categoryLabel }}
                   </span>
@@ -751,20 +738,12 @@ function onMobileQuickIndexClick() {
                 :to="item.href"
                 view-transition
                 role="option"
-                :aria-selected="idx === focusedIndex"
-                class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer"
-                :class="[
-                  idx === focusedIndex
-                    ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent-border)]'
-                    : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)]'
-                ]"
+                class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)] select-none"
                 @click="closeCommandModal"
-                @mouseenter="onCmdItemMouseEnter(idx)"
               >
                 <div class="flex items-center gap-3 min-w-0">
                   <div
-                    class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs transition-colors shadow-xs"
-                    :class="idx === focusedIndex ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface)] text-[var(--accent)] border border-[var(--border)]'"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs transition-colors shadow-xs bg-[var(--surface)] text-[var(--accent)] border border-[var(--border)] group-hover:bg-[var(--accent)] group-hover:text-white"
                   >
                     <svg v-if="item.icon === 'home'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                     <svg v-else-if="item.icon === 'briefcase'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="7" rx="2" stroke-width="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2" /></svg>
@@ -787,8 +766,7 @@ function onMobileQuickIndexClick() {
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                   <span
-                    class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold"
-                    :class="idx === focusedIndex ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface-alt)] text-[var(--ink-muted)] border border-[var(--border)]'"
+                    class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[var(--surface-alt)] text-[var(--ink-muted)] border border-[var(--border)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]"
                   >
                     {{ item.categoryLabel }}
                   </span>

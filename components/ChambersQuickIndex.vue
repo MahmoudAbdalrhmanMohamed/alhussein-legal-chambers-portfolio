@@ -92,10 +92,6 @@ function navigateToItem(href: string) {
   }
 }
 
-function onItemMouseEnter(idx: number) {
-  quickIndex.focusedIndex.value = idx
-}
-
 function onSelectCat(cat: 'ALL' | 'pages' | 'offices' | 'dockets' | 'procedures' | 'faq' | 'contact') {
   quickIndex.selectCategory(cat)
 }
@@ -372,14 +368,8 @@ function handleKeyDown(e: any) {
               rel="noopener"
               role="option"
               :aria-selected="idx === focusedIndex"
-              class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer"
-              :class="[
-                idx === focusedIndex
-                  ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent-border)]'
-                  : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)]'
-              ]"
+              class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)] select-none"
               @click="onClose"
-              @mouseenter="onItemMouseEnter(idx)"
             >
               <div class="flex items-center gap-3 min-w-0">
                 <div
@@ -437,14 +427,8 @@ function handleKeyDown(e: any) {
               view-transition
               role="option"
               :aria-selected="idx === focusedIndex"
-              class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer"
-              :class="[
-                idx === focusedIndex
-                  ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent-border)]'
-                  : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)]'
-              ]"
+              class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)] select-none"
               @click="onClose"
-              @mouseenter="onItemMouseEnter(idx)"
             >
               <div class="flex items-center gap-3 min-w-0">
                 <div

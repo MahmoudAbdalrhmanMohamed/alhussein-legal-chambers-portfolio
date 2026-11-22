@@ -231,12 +231,9 @@ function handleKeyDown(e: any) {
         :class="[
           option.id === currentVal
             ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold'
-            : idx === focusedIndex
-              ? 'bg-[var(--surface-alt)] text-[var(--ink)]'
-              : 'hover:bg-[var(--surface-alt)] text-[var(--ink)]'
+            : 'hover:bg-[var(--surface-alt)] text-[var(--ink)]'
         ]"
         @click="selectOption(option.id)"
-        @mouseenter="focusedIndex = idx"
       >
         <div class="flex items-center gap-3 min-w-0">
           <div

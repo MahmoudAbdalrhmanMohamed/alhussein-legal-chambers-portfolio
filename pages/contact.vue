@@ -90,10 +90,6 @@ function onChooseScope(id: string) {
   chooseScope(id)
 }
 
-function onOptionMouseEnter(idx: number) {
-  focusedOptionIndex.value = idx
-}
-
 function onRemoveAttachedFile() {
   removeAttachedFile()
 }
@@ -528,6 +524,14 @@ function copyProfileData() {
                 </div>
               </button>
 
+              <!-- Transparent Backdrop to dismiss dropdown on click outside -->
+              <div
+                v-if="selectOpen"
+                class="fixed inset-0 z-40 bg-transparent"
+                aria-hidden="true"
+                @click="closeSelectDropdown"
+              />
+
               <!-- Luxury Dropdown Popover Panel -->
               <div
                 v-if="selectOpen"
@@ -546,22 +550,20 @@ function copyProfileData() {
                   </span>
                 </div>
 
-                <!-- Options List -->
+                <!-- Options List (100% Pure CSS Hover - Zero Flickering, Instant Clicks) -->
                 <button
-                  v-for="(opt, idx) in scopes.value"
+                  v-for="opt in scopes.value"
                   :key="opt.id"
                   type="button"
                   role="option"
                   :aria-selected="selectedScopeId === opt.id ? 'true' : 'false'"
-                  class="w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-all cursor-pointer border"
+                  class="w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer border select-none"
                   :class="[
                     selectedScopeId === opt.id
                       ? 'bg-[var(--accent-soft)] border-[var(--accent)] shadow-xs'
-                      : 'border-transparent hover:border-[var(--border)] hover:bg-[var(--surface-alt)]',
-                    idx === focusedOptionIndex ? 'ring-1 ring-[var(--accent)]' : ''
+                      : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)]'
                   ]"
                   @click="onChooseScope(opt.id)"
-                  @mouseenter="onOptionMouseEnter(idx)"
                 >
                   <div class="flex items-center gap-3 min-w-0">
                     <div
