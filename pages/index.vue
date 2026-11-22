@@ -3,7 +3,7 @@ import { CV_TEXT_SUMMARIES, HUSSEIN_DATA } from '../composables/portfolioContent
 import { copyTextToClipboard, normalizeLocale } from '../composables/browserHelpers'
 
 definePageMeta({
-  viewTransition: true
+  viewTransition: false
 })
 
 const i18n = useI18n()
@@ -125,16 +125,16 @@ function copySummaryCv() {
         </div>
 
         <div class="flex flex-wrap items-center gap-3 pt-2">
-          <ResuxLink :to="officesHref" view-transition class="px-5 py-2.5 text-sm font-bold rx-btn-primary inline-block">
+          <ResuxLink :to="officesHref" class="px-5 py-2.5 text-sm font-bold rx-btn-primary inline-block">
             {{ profile.ctaPrimary }}
           </ResuxLink>
-          <ResuxLink :to="proceduresHref" view-transition class="px-4 py-2.5 text-sm font-bold rx-btn-outline inline-block">
+          <ResuxLink :to="proceduresHref" class="px-4 py-2.5 text-sm font-bold rx-btn-outline inline-block">
             {{ profile.ctaSecondary }}
           </ResuxLink>
-          <ResuxLink :to="cvHref" view-transition class="px-4 py-2.5 text-sm font-bold rx-btn-outline inline-block">
+          <ResuxLink :to="cvHref" class="px-4 py-2.5 text-sm font-bold rx-btn-outline inline-block">
             {{ profile.ctaTertiary }}
           </ResuxLink>
-          <ResuxLink :to="faqHref" view-transition class="px-4 py-2.5 text-sm font-bold rx-btn-outline inline-block">
+          <ResuxLink :to="faqHref" class="px-4 py-2.5 text-sm font-bold rx-btn-outline inline-block">
             {{ profile.ctaQuaternary }}
           </ResuxLink>
         </div>
@@ -182,7 +182,7 @@ function copySummaryCv() {
         </div>
 
         <div class="pt-3 border-t rx-divider grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <ResuxLink :to="contactHref" view-transition class="w-full py-2.5 px-3 text-xs rx-btn-accent text-center font-bold block">
+          <ResuxLink :to="contactHref" class="w-full py-2.5 px-3 text-xs rx-btn-accent text-center font-bold block">
             {{ profile.dossierCtaContact }}
           </ResuxLink>
           <button type="button" class="w-full py-2.5 px-3 text-xs rx-btn-outline text-center font-bold" @click="copySummaryCv">
@@ -193,7 +193,7 @@ function copySummaryCv() {
     </div>
 
     <!-- 4 Core Judicial Pillars -->
-    <div class="space-y-4 rx-stagger-2">
+    <div class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-sm font-bold tracking-wider text-[var(--accent)] flex items-center gap-2">
           <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M3 7h18M6 7l-3 7h6l-3-7zm12 0l-3 7h6l-3-7z" /></svg>
@@ -231,7 +231,7 @@ function copySummaryCv() {
     </div>
 
     <!-- 9 Practical Case Categories Matrix -->
-    <div class="rx-card-static p-6 sm:p-8 space-y-5 rx-stagger-3">
+    <div class="rx-card-static p-6 sm:p-8 space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b rx-divider pb-4">
         <div>
           <span class="text-xs font-bold tracking-wider text-[var(--accent)]">
@@ -241,7 +241,7 @@ function copySummaryCv() {
             {{ profile.matrixHeading }}
           </h3>
         </div>
-        <ResuxLink :to="proceduresHref" view-transition class="text-xs font-bold px-3.5 py-2 rx-btn-outline self-start">
+        <ResuxLink :to="proceduresHref" class="text-xs font-bold px-3.5 py-2 rx-btn-outline self-start">
           {{ profile.matrixCtaBtn }}
         </ResuxLink>
       </div>
@@ -263,12 +263,12 @@ function copySummaryCv() {
     </div>
 
     <!-- Featured Law Office Timeline Preview -->
-    <div class="space-y-4 rx-stagger-3">
+    <div class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-sm font-bold tracking-wider text-[var(--accent)]">
           {{ profile.featuredHeading }}
         </h2>
-        <ResuxLink :to="officesHref" view-transition class="text-xs font-bold underline underline-offset-4 hover:text-[var(--accent)]">
+        <ResuxLink :to="officesHref" class="text-xs font-bold underline underline-offset-4 hover:text-[var(--accent)]">
           {{ profile.featuredLink }}
         </ResuxLink>
       </div>

@@ -148,7 +148,7 @@ const PREFS_AND_SHORTCUTS_SCRIPT = `(function(){try{var r=document.documentEleme
 
 export default defineResuxConfig({
   router: {
-    viewTransition: true
+    viewTransition: false
   },
   routeRules: {
     '/**': {

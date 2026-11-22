@@ -140,23 +140,8 @@ html[lang="en"] .font-serif-editorial {
 }
 
 /* =====================================================================
-   NATIVE VIEW TRANSITIONS & SMOOTH ENTRANCE ANIMATIONS
+   SMOOTH MODAL & ACCORDION ENTRANCE ANIMATIONS
    ===================================================================== */
-@view-transition {
-  navigation: auto;
-}
-
-@keyframes rxFadeSlideOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-}
-
 @keyframes rxFadeSlideIn {
   from {
     opacity: 0;
@@ -184,28 +169,8 @@ html[lang="en"] .font-serif-editorial {
   to { opacity: 1; }
 }
 
-::view-transition-old(root) {
-  animation: 180ms cubic-bezier(0.4, 0, 1, 1) both rxFadeSlideOut;
-}
-
-::view-transition-new(root) {
-  animation: 260ms cubic-bezier(0.16, 1, 0.3, 1) both rxFadeSlideIn;
-}
-
 .rx-animate-in {
-  animation: rxFadeSlideIn 340ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.rx-stagger-1 {
-  animation: rxFadeSlideIn 360ms cubic-bezier(0.16, 1, 0.3, 1) 50ms both;
-}
-
-.rx-stagger-2 {
-  animation: rxFadeSlideIn 380ms cubic-bezier(0.16, 1, 0.3, 1) 110ms both;
-}
-
-.rx-stagger-3 {
-  animation: rxFadeSlideIn 400ms cubic-bezier(0.16, 1, 0.3, 1) 170ms both;
+  animation: rxFadeSlideIn 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .rx-modal-backdrop {

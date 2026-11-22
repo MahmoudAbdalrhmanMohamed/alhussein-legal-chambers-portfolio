@@ -4,7 +4,7 @@ import { copyTextToClipboard, normalizeLocale, showChambersToast } from '../comp
 import { useContactForm, LAWYER_EMAIL, getLegalScopeOptions } from '../composables/useContactForm'
 
 definePageMeta({
-  viewTransition: true
+  viewTransition: false
 })
 
 const i18n = useI18n()
@@ -206,7 +206,7 @@ function copyProfileData() {
 </script>
 
 <template>
-  <section class="space-y-8 rx-animate-in">
+  <section class="space-y-8">
     <!-- Header -->
     <div class="border-b rx-divider pb-6">
       <div class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2">
@@ -226,7 +226,7 @@ function copyProfileData() {
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <!-- Main Contact Form Section -->
-      <div class="lg:col-span-7 rx-card-static p-6 sm:p-8 space-y-5 rx-animate-in rx-stagger-1 relative overflow-visible">
+      <div class="lg:col-span-7 rx-card-static p-6 sm:p-8 space-y-5 relative overflow-visible">
         
         <!-- Loading Progress Bar -->
         <div
@@ -309,7 +309,6 @@ function copyProfileData() {
             </button>
             <ResuxLink
               :to="cvHref"
-              view-transition
               class="px-5 py-2.5 text-xs font-bold rx-btn-outline inline-flex items-center gap-1.5"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -771,7 +770,7 @@ function copyProfileData() {
       </div>
 
       <!-- Right Column: Official Bar Credentials & Quick CV Access -->
-      <div class="lg:col-span-5 space-y-5 rx-animate-in rx-stagger-2">
+      <div class="lg:col-span-5 space-y-5">
         <!-- Official Bar Credentials Card -->
         <div class="rx-card-double p-6 space-y-4">
           <h3 class="text-xs font-bold uppercase tracking-wider text-[var(--ink-muted)] border-b rx-divider pb-2">
@@ -803,7 +802,7 @@ function copyProfileData() {
             <button type="button" class="px-3.5 py-2 text-xs font-bold rx-btn-primary cursor-pointer" @click="copyCvSummary">
               {{ lang === 'ar' ? 'نسخ ملخص السيرة الذاتية' : 'Copy Resume Summary' }}
             </button>
-            <ResuxLink :to="cvHref" view-transition class="px-3.5 py-2 text-xs font-bold rx-btn-outline inline-flex items-center">
+            <ResuxLink :to="cvHref" class="px-3.5 py-2 text-xs font-bold rx-btn-outline inline-flex items-center">
               {{ lang === 'ar' ? 'معاينة السيرة الذاتية' : 'Open PDF Preview' }}
             </ResuxLink>
             <button type="button" class="px-3.5 py-2 text-xs font-bold rx-btn-outline cursor-pointer" @click="copyProfileData">

@@ -3,7 +3,7 @@ import { CV_TEXT_SUMMARIES } from '../composables/portfolioContent'
 import { copyTextToClipboard, normalizeLocale } from '../composables/browserHelpers'
 
 definePageMeta({
-  viewTransition: true
+  viewTransition: false
 })
 
 const i18n = useI18n()
@@ -79,7 +79,7 @@ function copySummary() {
 </script>
 
 <template>
-  <section class="space-y-7 rx-animate-in">
+  <section class="space-y-7">
     <div class="border-b rx-divider pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
         <div class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2">
@@ -117,7 +117,7 @@ function copySummary() {
       </div>
     </div>
 
-    <div class="rx-card-static overflow-hidden rx-animate-in rx-stagger-1">
+    <div class="rx-card-static overflow-hidden">
       <div class="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b rx-divider bg-[var(--surface-alt)]">
         <div class="flex items-center gap-2.5 min-w-0">
           <span class="w-8 h-8 rounded-sm rx-badge-accent inline-flex items-center justify-center shrink-0" aria-hidden="true">

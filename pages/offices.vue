@@ -3,7 +3,7 @@ import { HUSSEIN_DATA } from '../composables/portfolioContent'
 import { normalizeLocale } from '../composables/browserHelpers'
 
 definePageMeta({
-  viewTransition: true
+  viewTransition: false
 })
 
 const i18n = useI18n()
@@ -65,7 +65,7 @@ function onModalBackdropClick(event: any) {
 </script>
 
 <template>
-  <section class="space-y-8 rx-animate-in">
+  <section class="space-y-8">
     <div class="border-b rx-divider pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
         <div class="text-xs font-bold tracking-wider text-[var(--accent)] mb-2">
@@ -130,7 +130,7 @@ function onModalBackdropClick(event: any) {
           <button type="button" class="px-3.5 py-1.5 text-xs font-bold rx-btn-outline" @click="openDetailModal(item.id)">
             {{ lang === 'ar' ? 'استعراض السجل الكامل' : 'Inspect Full Case Record' }}
           </button>
-          <ResuxLink :to="contactHref" view-transition class="text-xs font-bold underline hover:text-[var(--accent)]">
+          <ResuxLink :to="contactHref" class="text-xs font-bold underline hover:text-[var(--accent)]">
             {{ lang === 'ar' ? 'تواصل بخصوص الخبرة ←' : 'Inquire About Experience →' }}
           </ResuxLink>
         </div>

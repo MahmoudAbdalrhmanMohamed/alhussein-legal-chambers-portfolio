@@ -3,7 +3,7 @@ import { HUSSEIN_DATA } from '../composables/portfolioContent'
 import { normalizeLocale } from '../composables/browserHelpers'
 
 definePageMeta({
-  viewTransition: true
+  viewTransition: false
 })
 
 const i18n = useI18n()
@@ -34,7 +34,7 @@ function toggleGuideItem(idx: number) {
 </script>
 
 <template>
-  <section class="space-y-10 rx-animate-in">
+  <section class="space-y-10">
     <div class="border-b rx-divider pb-6">
       <div class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2">
         {{ lang === 'ar'
@@ -53,7 +53,7 @@ function toggleGuideItem(idx: number) {
       </p>
     </div>
 
-    <div class="space-y-4 rx-animate-in rx-stagger-1">
+    <div class="space-y-4">
       <h2 class="text-sm font-bold uppercase tracking-wider text-[var(--accent)]">
         {{ profile.jurisdictionHeading }}
       </h2>
@@ -70,7 +70,7 @@ function toggleGuideItem(idx: number) {
       </div>
     </div>
 
-    <div class="space-y-4 rx-animate-in rx-stagger-2">
+    <div class="space-y-4">
       <h2 class="text-sm font-bold uppercase tracking-wider text-[var(--accent)]">
         {{ profile.guideHeading }}
       </h2>

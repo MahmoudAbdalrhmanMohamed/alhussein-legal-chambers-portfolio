@@ -282,7 +282,6 @@ function onMobileQuickIndexClick() {
           <ResuxLink
             id="btn-lang-switch"
             :to="switchLangHref"
-            view-transition
             class="px-3 py-1.5 text-xs font-bold rx-btn-primary inline-flex items-center gap-1.5"
             :title="lang === 'ar' ? 'التبديل إلى الإنجليزية' : 'Switch to Arabic'"
           >
@@ -329,7 +328,6 @@ function onMobileQuickIndexClick() {
           <div class="flex items-center gap-3.5 min-w-0">
             <ResuxLink
               :to="overviewHref"
-              view-transition
               class="w-12 h-12 rounded-full overflow-hidden border-2 border-[var(--accent)] shrink-0 shadow-sm hover:scale-105 transition-transform bg-[var(--surface-alt)]"
               :aria-label="profile.name"
             >
@@ -362,7 +360,6 @@ function onMobileQuickIndexClick() {
           <div class="flex items-center gap-2 shrink-0">
             <ResuxLink
               :to="contactHref"
-              view-transition
               class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rx-btn-primary"
             >
               <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
@@ -384,27 +381,27 @@ function onMobileQuickIndexClick() {
 
         <!-- Tier 2: Balanced Desktop Navigation Bar (Fits Cleanly Without Any Scrollbar) -->
         <nav id="primary-desktop-nav" class="hidden lg:grid grid-cols-6 gap-1.5 py-2 border-t rx-divider" :aria-label="lang === 'ar' ? 'التنقل الرئيسي' : 'Primary Navigation'">
-          <ResuxLink :to="overviewHref" view-transition :class="cleanPath === '/' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
+          <ResuxLink :to="overviewHref" :class="cleanPath === '/' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18M3 7h18M6 7l-3 7h6l-3-7zm12 0l-3 7h6l-3-7z" /></svg>
             <span>{{ profile.nav[0] }}</span>
           </ResuxLink>
-          <ResuxLink :to="officesHref" view-transition :class="cleanPath === '/offices' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
+          <ResuxLink :to="officesHref" :class="cleanPath === '/offices' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>
             <span>{{ profile.nav[1] }}</span>
           </ResuxLink>
-          <ResuxLink :to="proceduresHref" view-transition :class="cleanPath === '/procedures' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
+          <ResuxLink :to="proceduresHref" :class="cleanPath === '/procedures' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>
             <span>{{ profile.nav[2] }}</span>
           </ResuxLink>
-          <ResuxLink :to="faqHref" view-transition :class="cleanPath === '/faq' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
+          <ResuxLink :to="faqHref" :class="cleanPath === '/faq' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="10" r="3" /><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z" /></svg>
             <span>{{ profile.nav[3] }}</span>
           </ResuxLink>
-          <ResuxLink :to="cvHref" view-transition :class="cleanPath === '/cv' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
+          <ResuxLink :to="cvHref" :class="cleanPath === '/cv' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
             <span>{{ profile.nav[4] }}</span>
           </ResuxLink>
-          <ResuxLink :to="contactHref" view-transition :class="cleanPath === '/contact' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
+          <ResuxLink :to="contactHref" :class="cleanPath === '/contact' ? 'rx-nav-pill rx-nav-active' : 'rx-nav-pill'">
             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
             <span>{{ profile.nav[5] }}</span>
           </ResuxLink>
@@ -430,12 +427,12 @@ function onMobileQuickIndexClick() {
             <kbd class="font-mono-code text-[10px] px-1.5 py-0.5 rounded bg-black/20 text-white">⌘K</kbd>
           </button>
           <div class="grid grid-cols-2 gap-2">
-            <ResuxLink :to="overviewHref" view-transition :class="cleanPath === '/' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[0] }}</ResuxLink>
-            <ResuxLink :to="officesHref" view-transition :class="cleanPath === '/offices' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[1] }}</ResuxLink>
-            <ResuxLink :to="proceduresHref" view-transition :class="cleanPath === '/procedures' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[2] }}</ResuxLink>
-            <ResuxLink :to="faqHref" view-transition :class="cleanPath === '/faq' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[3] }}</ResuxLink>
-            <ResuxLink :to="cvHref" view-transition :class="cleanPath === '/cv' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[4] }}</ResuxLink>
-            <ResuxLink :to="contactHref" view-transition :class="cleanPath === '/contact' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[5] }}</ResuxLink>
+            <ResuxLink :to="overviewHref" :class="cleanPath === '/' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[0] }}</ResuxLink>
+            <ResuxLink :to="officesHref" :class="cleanPath === '/offices' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[1] }}</ResuxLink>
+            <ResuxLink :to="proceduresHref" :class="cleanPath === '/procedures' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[2] }}</ResuxLink>
+            <ResuxLink :to="faqHref" :class="cleanPath === '/faq' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[3] }}</ResuxLink>
+            <ResuxLink :to="cvHref" :class="cleanPath === '/cv' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[4] }}</ResuxLink>
+            <ResuxLink :to="contactHref" :class="cleanPath === '/contact' ? 'w-full text-start px-3 py-2 text-xs font-bold rx-badge-accent block' : 'w-full text-start px-3 py-2 text-xs font-semibold rx-btn-outline block'" @click="closeMobileMenu">{{ profile.nav[5] }}</ResuxLink>
           </div>
         </div>
       </div>
@@ -749,11 +746,10 @@ function onMobileQuickIndexClick() {
                 </div>
               </a>
 
-              <!-- Internal route via ResuxLink with view-transition -->
+              <!-- Internal route via ResuxLink -->
               <ResuxLink
                 v-else
                 :to="item.href"
-                view-transition
                 role="option"
                 class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)] select-none"
                 @click="closeCommandModal"

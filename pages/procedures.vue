@@ -3,7 +3,7 @@ import { PROCEDURAL_TRACKS } from '../composables/portfolioContent'
 import { normalizeLocale } from '../composables/browserHelpers'
 
 definePageMeta({
-  viewTransition: true
+  viewTransition: false
 })
 
 const i18n = useI18n()
@@ -72,7 +72,7 @@ function resetDocs() {
 </script>
 
 <template>
-  <section class="space-y-8 rx-animate-in">
+  <section class="space-y-8">
     <div class="border-b rx-divider pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
         <div class="text-xs font-bold tracking-wider text-[var(--accent)] mb-2">
@@ -206,7 +206,7 @@ function resetDocs() {
               : 'Reach out directly to Al Hussein Mohamed Abdallah to review your documents and discuss the proper legal procedure.' }}
           </p>
           <div class="flex flex-wrap gap-2 pt-1">
-            <ResuxLink :to="contactHref" view-transition class="px-4 py-2 text-xs font-bold rx-btn-primary inline-block">
+            <ResuxLink :to="contactHref" class="px-4 py-2 text-xs font-bold rx-btn-primary inline-block">
               {{ lang === 'ar' ? 'تواصل الآن ←' : 'Contact Now →' }}
             </ResuxLink>
             <a href="tel:01040542354" class="px-4 py-2 text-xs font-bold rx-btn-outline inline-block ltr-num">

@@ -420,11 +420,10 @@ function handleKeyDown(e: any) {
               </div>
             </a>
 
-            <!-- Internal route via ResuxLink with view-transition -->
+            <!-- Internal route via ResuxLink -->
             <ResuxLink
               v-else
               :to="item.href"
-              view-transition
               role="option"
               :aria-selected="idx === focusedIndex"
               class="group w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors border block cursor-pointer border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)] select-none"
