@@ -140,9 +140,19 @@ export function useContactForm(options: UseContactFormOptions) {
 
   const scopes = computed(() => getLegalScopeOptions(locale()))
 
-  const selectedScope = computed(() => {
-    return scopes.value.find((s) => s.id === selectedScopeId.value) || scopes.value[0]
-  })
+  function getSelectedScope(): ScopeOption {
+    const list = getLegalScopeOptions(locale())
+    const targetId = (selectedScopeId && (selectedScopeId as any).value !== undefined)
+      ? (selectedScopeId as any).value
+      : selectedScopeId
+    return list.find((s) => s.id === targetId) || list[0]
+  }
+
+  const selectedScope = {
+    get value() {
+      return getSelectedScope()
+    }
+  }
 
   const isEmpty = computed(() => {
     return !senderName.value.trim() && !senderEmail.value.trim() && !message.value.trim() && !attachedFile.value
@@ -347,6 +357,7 @@ export function useContactForm(options: UseContactFormOptions) {
     submittedEntry,
     scopes,
     selectedScope,
+    getSelectedScope,
     isEmpty,
     mailtoLink,
     handleFileUpload,

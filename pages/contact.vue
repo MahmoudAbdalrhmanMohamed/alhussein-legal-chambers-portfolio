@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CV_TEXT_SUMMARIES, HUSSEIN_DATA } from '../composables/portfolioContent'
 import { copyTextToClipboard, normalizeLocale, showChambersToast } from '../composables/browserHelpers'
-import { useContactForm, LAWYER_EMAIL } from '../composables/useContactForm'
+import { useContactForm, LAWYER_EMAIL, getLegalScopeOptions } from '../composables/useContactForm'
 
 definePageMeta({
   viewTransition: true
@@ -43,8 +43,6 @@ const {
   errorMessage,
   fieldErrors,
   submittedEntry,
-  scopes,
-  selectedScope,
   isEmpty,
   mailtoLink,
   handleFileUpload,
@@ -60,9 +58,16 @@ const {
   locale: () => lang.value
 })
 
+const scopes = computed(() => getLegalScopeOptions(lang.value))
+
 // Custom Luxury Select State & Handlers
 const selectOpen = ref(false)
 const focusedOptionIndex = ref(0)
+
+const currentScope = computed(() => {
+  const list = scopes.value || []
+  return list.find((s) => s.id === selectedScopeId.value) || list[0]
+})
 
 function toggleSelectDropdown() {
   selectOpen.value = !selectOpen.value
@@ -431,7 +436,7 @@ function copyProfileData() {
                 tabindex="-1"
                 aria-hidden="true"
               >
-                <option v-for="opt in scopes.value" :key="opt.id" :value="opt.id">
+                <option v-for="opt in scopes" :key="opt.id" :value="opt.id">
                   {{ opt.label }}
                 </option>
               </select>
@@ -468,26 +473,26 @@ function copyProfileData() {
                     class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-[var(--accent)] bg-[var(--accent-soft)] shadow-inner transition-colors"
                   >
                     <!-- Briefcase -->
-                    <svg v-if="selectedScope.value?.icon === 'briefcase'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-if="currentScope.icon === 'briefcase'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <rect width="20" height="14" x="2" y="7" rx="2" stroke-width="2" />
                       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2" />
                     </svg>
                     <!-- Building -->
-                    <svg v-else-if="selectedScope.value?.icon === 'building'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-else-if="currentScope.icon === 'building'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <rect width="16" height="20" x="4" y="2" rx="2" stroke-width="2" />
                       <path d="M9 22v-4h6v4" stroke-width="2" />
                       <path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" stroke-width="2" />
                     </svg>
                     <!-- Scales -->
-                    <svg v-else-if="selectedScope.value?.icon === 'scales'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-else-if="currentScope.icon === 'scales'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 7h18M6 7l-3 7h6l-3-7zm12 0l-3 7h6l-3-7z" />
                     </svg>
                     <!-- Gavel -->
-                    <svg v-else-if="selectedScope.value?.icon === 'gavel'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-else-if="currentScope.icon === 'gavel'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 13l-4 4m0 0l-4-4m4 4V3m-4 18h8" />
                     </svg>
                     <!-- Shield -->
-                    <svg v-else-if="selectedScope.value?.icon === 'shield'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-else-if="currentScope.icon === 'shield'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
                     <!-- Default Chat -->
@@ -499,10 +504,10 @@ function copyProfileData() {
                   <!-- Text Preview -->
                   <div class="text-start truncate">
                     <div class="font-bold text-sm text-[var(--ink)] truncate leading-tight">
-                      {{ selectedScope.value?.label }}
+                      {{ currentScope.label }}
                     </div>
                     <div class="text-xs text-[var(--ink-muted)] truncate mt-0.5">
-                      {{ selectedScope.value?.description }}
+                      {{ currentScope.description }}
                     </div>
                   </div>
                 </div>
@@ -524,14 +529,6 @@ function copyProfileData() {
                 </div>
               </button>
 
-              <!-- Transparent Backdrop to dismiss dropdown on click outside -->
-              <div
-                v-if="selectOpen"
-                class="fixed inset-0 z-40 bg-transparent"
-                aria-hidden="true"
-                @click="closeSelectDropdown"
-              />
-
               <!-- Luxury Dropdown Popover Panel -->
               <div
                 v-if="selectOpen"
@@ -552,7 +549,7 @@ function copyProfileData() {
 
                 <!-- Options List (100% Pure CSS Hover - Zero Flickering, Instant Clicks) -->
                 <button
-                  v-for="opt in scopes.value"
+                  v-for="opt in scopes"
                   :key="opt.id"
                   type="button"
                   role="option"
