@@ -303,12 +303,19 @@ function onMobileQuickIndexClick() {
           <button
             id="btn-cmd-open"
             type="button"
-            class="px-3 py-1.5 text-xs font-semibold rx-btn-outline inline-flex items-center gap-2 hover:border-[var(--accent)] transition-colors cursor-pointer"
+            class="px-3 py-1.5 text-xs font-semibold rx-btn-outline inline-flex items-center gap-2 hover:border-[var(--accent)] transition-colors cursor-pointer group"
             :title="lang === 'ar' ? 'فتح الفهرس السريع والبحث (⌘K)' : 'Open Quick Index & Search (⌘K)'"
             @click="openCommandModal"
           >
-            <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            <span>{{ profile.cmdLabel }}</span>
+            <!-- Normal Search Icon -->
+            <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0 cmd-icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <!-- Spinning Loading Icon -->
+            <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0 animate-spin cmd-icon-loading hidden" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            <span class="cmd-text-idle">{{ profile.cmdLabel }}</span>
+            <span class="cmd-text-loading hidden text-[var(--accent)] font-bold">{{ lang === 'ar' ? 'جارٍ الفهرسة...' : 'Loading...' }}</span>
             <kbd class="hidden sm:inline px-1.5 py-0.5 bg-[var(--surface-alt)] border rx-divider text-[10px] font-mono-code text-[var(--ink-muted)] rounded leading-none">⌘K</kbd>
           </button>
         </div>
@@ -406,13 +413,19 @@ function onMobileQuickIndexClick() {
         <!-- Mobile Drawer -->
         <div v-if="mobileDrawerOpen" id="mobile-nav-drawer" class="lg:hidden border-t rx-divider py-3 rx-accordion-body">
           <button
+            id="btn-mobile-cmd"
             type="button"
             class="w-full text-start px-3.5 py-2.5 text-xs font-bold rx-btn-primary flex items-center justify-between mb-2 shadow-sm rounded-xl cursor-pointer"
             @click="onMobileQuickIndexClick"
           >
             <span class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-              <span>{{ lang === 'ar' ? 'الفهرس القانوني السريع والبحث' : 'Quick Legal Index & Search' }}</span>
+              <svg class="w-4 h-4 text-white shrink-0 cmd-icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <svg class="w-4 h-4 text-white shrink-0 animate-spin cmd-icon-loading hidden" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              <span class="cmd-text-idle">{{ lang === 'ar' ? 'الفهرس القانوني السريع والبحث' : 'Quick Legal Index & Search' }}</span>
+              <span class="cmd-text-loading hidden font-bold">{{ lang === 'ar' ? 'جارٍ تحميل وفهرسة السجلات...' : 'Indexing records...' }}</span>
             </span>
             <kbd class="font-mono-code text-[10px] px-1.5 py-0.5 rounded bg-black/20 text-white">⌘K</kbd>
           </button>
@@ -582,9 +595,13 @@ function onMobileQuickIndexClick() {
         <!-- Modal Body (Results / Loading / Error / Empty States) -->
         <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-1.5 focus:outline-none max-h-[50vh]" role="listbox">
           
-          <!-- 1. LOADING STATE (Shimmer Skeleton Cards) -->
-          <div v-if="isLoading" class="space-y-2 py-4">
-            <div class="flex items-center justify-center gap-2 text-xs font-semibold text-[var(--accent)] py-2">
+          <!-- 1. LOADING STATE (Shimmer Skeleton Cards shown initially or until indexed) -->
+          <div
+            v-if="!searchQuery"
+            id="cmd-loading-skeleton"
+            class="space-y-2 py-1 rx-cmd-skeleton-loader"
+          >
+            <div class="flex items-center justify-center gap-2 text-xs font-semibold text-[var(--accent)] py-1.5">
               <svg class="animate-spin h-4 w-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
@@ -592,7 +609,7 @@ function onMobileQuickIndexClick() {
               <span>{{ lang === 'ar' ? 'جارٍ تحميل وفهرسة السجلات القانونية...' : 'Indexing legal records and dockets...' }}</span>
             </div>
 
-            <div v-for="n in 4" :key="n" class="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-alt)] animate-pulse flex items-center justify-between gap-3">
+            <div v-for="n in 3" :key="n" class="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-alt)] animate-pulse flex items-center justify-between gap-3">
               <div class="flex items-center gap-3 w-3/4">
                 <div class="w-8 h-8 rounded-lg bg-[var(--border)] shrink-0" />
                 <div class="space-y-1.5 w-full">
@@ -606,7 +623,7 @@ function onMobileQuickIndexClick() {
 
           <!-- 2. ERROR STATE (Clear alert with retry action) -->
           <div
-            v-else-if="isError"
+            v-if="isError"
             role="alert"
             class="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center space-y-3 rx-animate-in"
           >
@@ -673,7 +690,7 @@ function onMobileQuickIndexClick() {
           </div>
 
           <!-- 4. ACTIVE RESULTS LIST -->
-          <div v-else class="space-y-1">
+          <div v-else id="cmd-results-list" class="space-y-1 rx-cmd-results-reveal">
             <div v-for="(item, idx) in filteredItems" :key="item.id" class="contents">
               <!-- External / Direct link (tel, mailto, pdf) -->
               <a
