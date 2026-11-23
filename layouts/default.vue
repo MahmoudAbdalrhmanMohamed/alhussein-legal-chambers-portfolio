@@ -163,7 +163,12 @@ function closeCommandModal() {
 }
 
 function onCmdBackdropClick(event: any) {
-  if (event && event.target === event.currentTarget) {
+  const target = event?.target as any
+  if (!target) {
+    closeCommandModal()
+    return
+  }
+  if (target.id === 'rx-cmd-modal' || !target.closest?.('.rx-card-static')) {
     closeCommandModal()
   }
 }
@@ -450,12 +455,12 @@ function onMobileQuickIndexClick() {
       role="dialog"
       aria-modal="true"
       :aria-label="lang === 'ar' ? 'الفهرس السريع والبحث' : 'Quick Index & Global Search'"
-      class="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-xs pt-12 sm:pt-20 p-3 sm:p-4 rx-modal-backdrop rx-animate-in"
+      class="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-xs pt-12 sm:pt-20 p-3 sm:p-4"
       @click="onCmdBackdropClick"
     >
       <div
-        class="rx-card-static max-w-2xl w-full flex flex-col max-h-[85vh] shadow-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] overflow-hidden rx-modal-panel"
-        @click="onCmdPanelClick"
+        class="rx-card-static max-w-2xl w-full flex flex-col max-h-[85vh] shadow-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] overflow-hidden"
+        @click.stop="onCmdPanelClick"
       >
         <!-- Modal Header & Search Bar -->
         <div class="p-4 sm:p-5 border-b rx-divider bg-[var(--surface)] space-y-3">
@@ -592,11 +597,11 @@ function onMobileQuickIndexClick() {
         <!-- Modal Body (Results / Loading / Error / Empty States) -->
         <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-1.5 focus:outline-none max-h-[50vh]" role="listbox">
           
-          <!-- 1. LOADING STATE (Shimmer Skeleton Cards shown initially or until indexed) -->
+          <!-- 1. LOADING STATE (Shown only if data is actively indexing) -->
           <div
-            v-if="!searchQuery"
+            v-if="isLoading"
             id="cmd-loading-skeleton"
-            class="space-y-2 py-1 rx-cmd-skeleton-loader"
+            class="space-y-2 py-4 text-center"
           >
             <div class="flex items-center justify-center gap-2 text-xs font-semibold text-[var(--accent)] py-1.5">
               <svg class="animate-spin h-4 w-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24">
@@ -605,24 +610,13 @@ function onMobileQuickIndexClick() {
               </svg>
               <span>{{ lang === 'ar' ? 'جارٍ تحميل وفهرسة السجلات القانونية...' : 'Indexing legal records and dockets...' }}</span>
             </div>
-
-            <div v-for="n in 3" :key="n" class="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-alt)] animate-pulse flex items-center justify-between gap-3">
-              <div class="flex items-center gap-3 w-3/4">
-                <div class="w-8 h-8 rounded-lg bg-[var(--border)] shrink-0" />
-                <div class="space-y-1.5 w-full">
-                  <div class="h-3.5 bg-[var(--border)] rounded w-1/2" />
-                  <div class="h-2.5 bg-[var(--border)] rounded w-3/4" />
-                </div>
-              </div>
-              <div class="h-4 w-12 bg-[var(--border)] rounded" />
-            </div>
           </div>
 
           <!-- 2. ERROR STATE (Clear alert with retry action) -->
           <div
-            v-if="isError"
+            v-else-if="isError"
             role="alert"
-            class="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center space-y-3 rx-animate-in"
+            class="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center space-y-3"
           >
             <div class="w-10 h-10 rounded-full bg-red-500/20 text-red-600 flex items-center justify-center mx-auto">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -650,7 +644,7 @@ function onMobileQuickIndexClick() {
           <!-- 3. EMPTY STATE (Clear feedback when search query has 0 matches) -->
           <div
             v-else-if="isEmpty"
-            class="p-8 text-center space-y-3 text-[var(--ink-muted)] rx-animate-in"
+            class="p-8 text-center space-y-3 text-[var(--ink-muted)]"
           >
             <div class="w-12 h-12 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--ink-muted)] flex items-center justify-center mx-auto">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -687,7 +681,7 @@ function onMobileQuickIndexClick() {
           </div>
 
           <!-- 4. ACTIVE RESULTS LIST -->
-          <div v-else id="cmd-results-list" class="space-y-1 rx-cmd-results-reveal">
+          <div v-else id="cmd-results-list" class="space-y-1">
             <div v-for="(item, idx) in filteredItems" :key="item.id" class="contents">
               <!-- External / Direct link (tel, mailto, pdf) -->
               <a

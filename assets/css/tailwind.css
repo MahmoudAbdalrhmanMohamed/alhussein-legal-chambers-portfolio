@@ -356,59 +356,6 @@ html[lang="en"] .font-serif-editorial {
   transform: scale(1.14);
 }
 
-/* Quick Index Smooth Skeleton Loading Animation */
-@keyframes rx-skeleton-shimmer-fade {
-  0% {
-    opacity: 1;
-    max-height: 400px;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-  70% {
-    opacity: 1;
-    max-height: 400px;
-  }
-  99% {
-    opacity: 0;
-    max-height: 0;
-    margin-bottom: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-  100% {
-    opacity: 0;
-    max-height: 0;
-    margin-bottom: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    display: none;
-    pointer-events: none;
-  }
-}
-
-.rx-cmd-skeleton-loader {
-  animation: rx-skeleton-shimmer-fade 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
-}
-
-@keyframes rx-results-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  60% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.rx-cmd-results-reveal {
-  animation: rx-results-reveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

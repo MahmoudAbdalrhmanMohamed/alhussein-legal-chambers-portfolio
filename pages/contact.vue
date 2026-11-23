@@ -62,6 +62,7 @@ const scopes = computed(() => getLegalScopeOptions(lang.value))
 
 // Custom Luxury Select State & Handlers
 const selectOpen = ref(false)
+const isSelectOpen = computed(() => Boolean(selectOpen.value))
 const focusedOptionIndex = ref(0)
 
 const currentScope = computed(() => {
@@ -88,6 +89,12 @@ function closeSelectDropdown() {
 
 function chooseScope(id: string) {
   selectedScopeId.value = id
+  if (typeof document !== 'undefined') {
+    const el = document.getElementById('native-scope-select') as any
+    if (el) {
+      el.value = id
+    }
+  }
   closeSelectDropdown()
 }
 
@@ -174,9 +181,47 @@ function formatBytes(bytes?: number): string {
   return `${(kb / 1024).toFixed(1)} MB`
 }
 
+const isFormSubmitted = ref(false)
+const receiptData = ref<any>({
+  id: 0,
+  senderName: '',
+  senderEmail: '',
+  senderPhone: '',
+  inquiryScope: '',
+  attachment: null
+})
+const isFormLoading = computed(() => Boolean(isSubmitting.value))
+const formError = computed(() => errorMessage.value || '')
+const errors = computed(() => fieldErrors.value || {})
+const attachedDoc = computed(() => attachedFileInfo.value)
+const docError = computed(() => fileError.value || '')
+
+function syncInputs() {
+  if (typeof document !== 'undefined') {
+    const nameEl = document.getElementById('input-sender-name') as any
+    const emailEl = document.getElementById('input-sender-email') as any
+    const phoneEl = document.getElementById('input-sender-phone') as any
+    const msgEl = document.getElementById('input-inquiry-msg') as any
+    if (nameEl && nameEl.value !== undefined) senderName.value = nameEl.value
+    if (emailEl && emailEl.value !== undefined) senderEmail.value = emailEl.value
+    if (phoneEl && phoneEl.value !== undefined) senderPhone.value = phoneEl.value
+    if (msgEl && msgEl.value !== undefined) message.value = msgEl.value
+  }
+}
+
 async function onFormSubmit() {
+  syncInputs()
   const success = await submit()
   if (success) {
+    receiptData.value = submittedEntry.value || {
+      id: Date.now(),
+      senderName: senderName.value,
+      senderEmail: senderEmail.value,
+      senderPhone: senderPhone.value,
+      inquiryScope: currentScope.value?.label || '',
+      attachment: attachedFileInfo.value
+    }
+    isFormSubmitted.value = true
     showChambersToast(
       lang.value === 'ar'
         ? 'تم إرسال الرسالة وتأكيد التكليف بنجاح'
@@ -187,6 +232,15 @@ async function onFormSubmit() {
 
 function onResetForm() {
   resetForm()
+  isFormSubmitted.value = false
+  receiptData.value = {
+    id: 0,
+    senderName: '',
+    senderEmail: '',
+    senderPhone: '',
+    inquiryScope: '',
+    attachment: null
+  }
   selectOpen.value = false
 }
 
@@ -230,14 +284,14 @@ function copyProfileData() {
         
         <!-- Loading Progress Bar -->
         <div
-          v-if="isSubmitting.value"
+          v-if="isFormLoading"
           class="absolute top-0 left-0 right-0 h-1 bg-[var(--accent-soft)] overflow-hidden z-20 rounded-t-2xl"
         >
           <div class="w-full h-full bg-[var(--accent)] animate-pulse" />
         </div>
 
         <!-- SUCCESS STATE -->
-        <div v-if="isSuccess.value && submittedEntry.value" class="space-y-6 py-4 rx-animate-in">
+        <div v-show="isFormSubmitted" id="rx-success-state" class="space-y-6 py-4 rx-animate-in">
           <div class="flex items-start gap-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
             <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,34 +319,34 @@ function copyProfileData() {
                 {{ lang === 'ar' ? 'إشعار استلام رسمي رقم:' : 'Official Dispatch Receipt #:' }}
               </span>
               <span class="font-mono font-bold text-[var(--ink)]">
-                #RX-{{ submittedEntry.value.id }}
+                #RX-{{ receiptData.id || '' }}
               </span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div>
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'اسم الراسل:' : 'Sender Name:' }}</span>
-                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.value.senderName }}</span>
+                <span class="font-semibold text-[var(--ink)]">{{ receiptData.senderName || '' }}</span>
               </div>
               <div>
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'البريد الإلكتروني:' : 'Email Address:' }}</span>
-                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.value.senderEmail }}</span>
+                <span class="font-semibold text-[var(--ink)]">{{ receiptData.senderEmail || '' }}</span>
               </div>
-              <div v-if="submittedEntry.value.senderPhone">
+              <div v-if="receiptData.senderPhone">
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'الهاتف / واتساب:' : 'Phone / WhatsApp:' }}</span>
-                <span class="font-semibold text-[var(--ink)]" dir="ltr">{{ submittedEntry.value.senderPhone }}</span>
+                <span class="font-semibold text-[var(--ink)]" dir="ltr">{{ receiptData.senderPhone || '' }}</span>
               </div>
               <div>
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'القطاع القانوني:' : 'Legal Sector:' }}</span>
-                <span class="font-semibold text-[var(--ink)]">{{ submittedEntry.value.inquiryScope }}</span>
+                <span class="font-semibold text-[var(--ink)]">{{ receiptData.inquiryScope || '' }}</span>
               </div>
-              <div v-if="submittedEntry.value.attachment" class="sm:col-span-2">
+              <div v-if="receiptData.attachment" class="sm:col-span-2">
                 <span class="text-[var(--ink-muted)] block mb-0.5">{{ lang === 'ar' ? 'الملف المرفق:' : 'Attached File:' }}</span>
                 <span class="font-semibold text-[var(--accent)] inline-flex items-center gap-1.5">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                   </svg>
-                  {{ submittedEntry.value.attachment.name }}
+                  {{ receiptData.attachment.name || '' }}
                 </span>
               </div>
             </div>
@@ -320,7 +374,7 @@ function copyProfileData() {
         </div>
 
         <!-- FORM STATE (Empty, Filling, Loading, Error) -->
-        <div v-else class="space-y-5">
+        <div v-show="!isFormSubmitted" class="space-y-5">
           <div class="border-b rx-divider pb-3 flex items-center justify-between gap-3">
             <h2 class="text-base font-bold text-[var(--ink)]">
               {{ lang === 'ar'
@@ -334,7 +388,7 @@ function copyProfileData() {
 
           <!-- GLOBAL ERROR ALERT -->
           <div
-            v-if="errorMessage.value"
+            v-if="formError"
             role="alert"
             class="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 space-y-2 rx-animate-in"
           >
@@ -342,7 +396,7 @@ function copyProfileData() {
               <svg class="w-4 h-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{{ errorMessage.value }}</span>
+              <span>{{ formError }}</span>
             </div>
             <div class="text-[11px] pt-1 border-t border-red-500/20 flex flex-wrap items-center gap-2">
               <span>{{ lang === 'ar' ? 'أو يمكنك التواصل مباشرة عبر تطبيق بريدك:' : 'Or send directly via your email client:' }}</span>
@@ -373,13 +427,13 @@ function copyProfileData() {
                   v-model="senderName"
                   type="text"
                   required
-                  :disabled="isSubmitting.value"
+                  :disabled="isFormLoading"
                   :placeholder="lang === 'ar' ? 'مثال: مكتب محاماة أو الإدارة القانونية بشركة...' : 'Managing Partner / Law Firm'"
                   class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.value && fieldErrors.value.senderName }"
+                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': errors && errors.senderName }"
                 >
-                <p v-if="fieldErrors.value && fieldErrors.value.senderName" class="text-xs text-red-600 font-semibold mt-1">
-                  {{ fieldErrors.value.senderName }}
+                <p v-if="errors && errors.senderName" class="text-xs text-red-600 font-semibold mt-1">
+                  {{ errors.senderName }}
                 </p>
               </div>
 
@@ -393,13 +447,13 @@ function copyProfileData() {
                   v-model="senderEmail"
                   type="email"
                   required
-                  :disabled="isSubmitting.value"
+                  :disabled="isFormLoading"
                   :placeholder="lang === 'ar' ? 'example@lawfirm.com' : 'counsel@lawfirm.com'"
                   class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.value && fieldErrors.value.senderEmail }"
+                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': errors && errors.senderEmail }"
                 >
-                <p v-if="fieldErrors.value && fieldErrors.value.senderEmail" class="text-xs text-red-600 font-semibold mt-1">
-                  {{ fieldErrors.value.senderEmail }}
+                <p v-if="errors && errors.senderEmail" class="text-xs text-red-600 font-semibold mt-1">
+                  {{ errors.senderEmail }}
                 </p>
               </div>
             </div>
@@ -413,7 +467,7 @@ function copyProfileData() {
                 id="input-sender-phone"
                 v-model="senderPhone"
                 type="tel"
-                :disabled="isSubmitting.value"
+                :disabled="isFormLoading"
                 :placeholder="lang === 'ar' ? '010XXXXXXXX أو +2010XXXXXXXX' : '+20 10X XXX XXXX'"
                 class="rx-input w-full px-3 py-2.5 text-sm"
                 dir="ltr"
@@ -442,7 +496,7 @@ function copyProfileData() {
 
               <!-- Transparent backdrop overlay when select is open -->
               <div
-                v-if="selectOpen"
+                v-show="selectOpen"
                 class="fixed inset-0 z-40 bg-black/10 backdrop-blur-[0.5px] cursor-default"
                 aria-hidden="true"
                 @click="closeSelectDropdown"
@@ -456,13 +510,13 @@ function copyProfileData() {
                 :aria-expanded="selectOpen ? 'true' : 'false'"
                 aria-haspopup="listbox"
                 aria-controls="scope-options-listbox"
-                :disabled="isSubmitting.value"
+                :disabled="isFormLoading"
                 class="relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all shadow-xs cursor-pointer z-20"
                 :class="[
                   selectOpen
                     ? 'border-[var(--accent)] ring-2 ring-[var(--accent-soft)] bg-[var(--surface-elevated)] shadow-lg'
                     : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:border-[var(--accent)] hover:shadow-sm',
-                  isSubmitting.value ? 'opacity-60 cursor-not-allowed' : ''
+                  isFormLoading ? 'opacity-60 cursor-not-allowed' : ''
                 ]"
                 @click="toggleSelectDropdown"
               >
@@ -530,11 +584,11 @@ function copyProfileData() {
 
               <!-- Luxury Dropdown Popover Panel -->
               <div
-                v-if="selectOpen"
+                v-show="selectOpen"
                 id="scope-options-listbox"
                 role="listbox"
                 aria-label="Legal Sectors"
-                class="absolute start-0 end-0 z-50 mt-2 p-2 rounded-2xl border-2 border-[var(--accent)]/30 bg-[var(--surface-elevated)] shadow-2xl space-y-1 rx-animate-in max-h-96 overflow-y-auto"
+                class="absolute start-0 end-0 z-50 mt-2 p-2 rounded-2xl border-2 border-[var(--accent)]/30 bg-[var(--surface-elevated)] shadow-2xl space-y-1 max-h-96 overflow-y-auto"
               >
                 <!-- Popover Header -->
                 <div class="px-3 py-2 border-b rx-divider flex items-center justify-between text-xs">
@@ -626,19 +680,19 @@ function copyProfileData() {
                 type="file"
                 class="hidden"
                 accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
-                :disabled="isSubmitting.value"
+                :disabled="isFormLoading"
                 @change="onFileInputChange"
               >
 
               <!-- EMPTY / DROPZONE STATE -->
               <div
-                v-if="!attachedFileInfo.value"
+                v-if="!attachedDoc"
                 class="border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer"
                 :class="[
                   isDraggingFile
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent-soft)]'
                     : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
-                  isSubmitting.value ? 'opacity-60 cursor-not-allowed' : ''
+                  isFormLoading ? 'opacity-60 cursor-not-allowed' : ''
                 ]"
                 @click="triggerFileInput"
                 @dragover="onFileDragOver"
@@ -673,10 +727,10 @@ function copyProfileData() {
                   </div>
                   <div class="truncate">
                     <div class="font-bold text-[var(--ink)] truncate">
-                      {{ attachedFileInfo.value.name }}
+                      {{ attachedDoc.name }}
                     </div>
                     <div class="flex items-center gap-2 text-[11px] text-[var(--ink-muted)] mt-0.5">
-                      <span>{{ formatBytes(attachedFileInfo.value.size) }}</span>
+                      <span>{{ formatBytes(attachedDoc.size) }}</span>
                       <span>•</span>
                       <span class="text-emerald-700 dark:text-emerald-400 font-semibold">
                         {{ lang === 'ar' ? '✓ تم تجهيز الملف للإرفاق' : '✓ Ready to dispatch' }}
@@ -699,11 +753,11 @@ function copyProfileData() {
               </div>
 
               <!-- FILE ERROR MESSAGE -->
-              <div v-if="fileError.value" class="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+              <div v-if="docError" class="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
                 <svg class="w-4 h-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{{ fileError.value }}</span>
+                <span>{{ docError }}</span>
               </div>
             </div>
 
@@ -718,26 +772,28 @@ function copyProfileData() {
                 v-model="message"
                 rows="4"
                 required
-                :disabled="isSubmitting.value"
+                :disabled="isFormLoading"
                 :placeholder="lang === 'ar' ? 'يرجى كتابة تفاصيل الوظيفة، موضوع الاستشارة، أو الموعد المقترح للمقابلة...' : 'Share role details, legal mandate, or preferred interview schedule...'"
                 class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': fieldErrors.value && fieldErrors.value.message }"
-              />
-              <p v-if="fieldErrors.value && fieldErrors.value.message" class="text-xs text-red-600 font-semibold mt-1">
-                {{ fieldErrors.value.message }}
+                :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': errors && errors.message }"
+              ></textarea>
+              <p v-if="errors && errors.message" class="text-xs text-red-600 font-semibold mt-1">
+                {{ errors.message }}
               </p>
             </div>
 
             <!-- Row 6: Submit Button, Loading Spinner & Direct Mail Fallback -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t rx-divider">
               <button
-                type="submit"
-                :disabled="isSubmitting.value"
+                id="rx-submit-btn"
+                type="button"
+                :disabled="isFormLoading"
                 class="px-6 py-2.5 text-sm font-bold rx-btn-primary flex items-center justify-center gap-2 min-w-[200px] disabled:opacity-60 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
+                @click="onFormSubmit"
               >
                 <!-- Animated Spinner during loading -->
                 <svg
-                  v-if="isSubmitting.value"
+                  v-if="isFormLoading"
                   class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -747,7 +803,7 @@ function copyProfileData() {
                 </svg>
 
                 <span>
-                  {{ isSubmitting.value
+                  {{ isFormLoading
                     ? (lang === 'ar' ? 'جارٍ إرسال الرسالة والتكليف...' : 'Dispatching Inquiry...')
                     : (lang === 'ar' ? 'إرسال الرسالة والتكليف القانوني ←' : 'Send Legal Inquiry →') }}
                 </span>

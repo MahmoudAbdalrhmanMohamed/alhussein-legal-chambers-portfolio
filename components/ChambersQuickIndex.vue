@@ -42,7 +42,12 @@ watch(isOpen, (val) => {
 })
 
 function onBackdropClick(event: any) {
-  if (event && event.target === event.currentTarget) {
+  const target = event?.target as any
+  if (!target) {
+    onClose()
+    return
+  }
+  if (target.id === 'rx-cmd-modal' || !target.closest?.('.rx-card-static')) {
     onClose()
   }
 }
@@ -124,13 +129,13 @@ function handleKeyDown(e: any) {
     role="dialog"
     aria-modal="true"
     :aria-label="activeLocale === 'ar' ? 'الفهرس السريع والبحث' : 'Quick Index & Global Search'"
-    class="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-xs pt-12 sm:pt-20 p-3 sm:p-4 rx-modal-backdrop rx-animate-in"
+    class="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-xs pt-12 sm:pt-20 p-3 sm:p-4"
     @click="onBackdropClick"
     @keydown="handleKeyDown"
   >
     <div
-      class="rx-card-static max-w-2xl w-full flex flex-col max-h-[85vh] shadow-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] overflow-hidden rx-modal-panel"
-      @click="onPanelClick"
+      class="rx-card-static max-w-2xl w-full flex flex-col max-h-[85vh] shadow-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] overflow-hidden"
+      @click.stop="onPanelClick"
     >
       <!-- Modal Header & Search Bar -->
       <div class="p-4 sm:p-5 border-b rx-divider bg-[var(--surface)] space-y-3">
