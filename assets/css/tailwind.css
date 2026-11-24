@@ -169,16 +169,20 @@ html[lang="en"] .font-serif-editorial {
   to { opacity: 1; }
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .rx-animate-in {
   animation: rxFadeSlideIn 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .rx-modal-backdrop {
-  animation: rxBackdropIn 180ms ease both;
+  animation: none !important;
 }
 
 .rx-modal-panel {
-  animation: rxModalIn 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: none !important;
 }
 
 .rx-accordion-body {

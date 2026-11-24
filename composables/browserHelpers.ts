@@ -117,6 +117,98 @@ export function showChambersToast(msg: string): void {
   }, 3200)
 }
 
+export function syncScopeSelectionDom(id: string, label?: string, desc?: string): void {
+  const doc = globalThis.document
+  if (!doc) return
+  const sel = doc.getElementById('native-scope-select') as HTMLSelectElement | null
+  if (sel) {
+    sel.value = id
+    for (let i = 0; i < sel.options.length; i++) {
+      sel.options[i].selected = (sel.options[i].value === id)
+    }
+  }
+  if (label) {
+    const lblEl = doc.getElementById('scope-trigger-label')
+    if (lblEl) lblEl.textContent = label
+  }
+  if (desc) {
+    const descEl = doc.getElementById('scope-trigger-desc')
+    if (descEl) descEl.textContent = desc
+  }
+  const lb = doc.getElementById('scope-options-listbox')
+  if (lb) {
+    lb.hidden = true
+    lb.setAttribute('hidden', 'true')
+    lb.style.display = 'none'
+  }
+  const bd = doc.getElementById('scope-select-backdrop')
+  if (bd) {
+    bd.hidden = true
+    bd.setAttribute('hidden', 'true')
+    bd.style.display = 'none'
+  }
+  const trig = doc.getElementById('input-inquiry-scope')
+  if (trig) {
+    trig.setAttribute('aria-expanded', 'false')
+  }
+}
+
+export function toggleSelectDropdownDom(isOpen: boolean): void {
+  const doc = globalThis.document
+  if (!doc) return
+  const lb = doc.getElementById('scope-options-listbox')
+  const bd = doc.getElementById('scope-select-backdrop')
+  const trig = doc.getElementById('input-inquiry-scope')
+  if (isOpen) {
+    if (lb) {
+      lb.hidden = false
+      lb.removeAttribute('hidden')
+      lb.style.display = 'block'
+    }
+    if (bd) {
+      bd.hidden = false
+      bd.removeAttribute('hidden')
+      bd.style.display = 'block'
+    }
+    if (trig) trig.setAttribute('aria-expanded', 'true')
+  } else {
+    if (lb) {
+      lb.hidden = true
+      lb.setAttribute('hidden', 'true')
+      lb.style.display = 'none'
+    }
+    if (bd) {
+      bd.hidden = true
+      bd.setAttribute('hidden', 'true')
+      bd.style.display = 'none'
+    }
+    if (trig) trig.setAttribute('aria-expanded', 'false')
+  }
+}
+
+export function syncContactFormDomInputs(): {
+  name?: string
+  email?: string
+  phone?: string
+  scopeId?: string
+  message?: string
+} {
+  const doc = globalThis.document
+  if (!doc) return {}
+  const res: { name?: string; email?: string; phone?: string; scopeId?: string; message?: string } = {}
+  const nameEl = doc.getElementById('input-sender-name') as HTMLInputElement | null
+  const emailEl = doc.getElementById('input-sender-email') as HTMLInputElement | null
+  const phoneEl = doc.getElementById('input-sender-phone') as HTMLInputElement | null
+  const scopeEl = doc.getElementById('native-scope-select') as HTMLSelectElement | null
+  const msgEl = doc.getElementById('input-inquiry-msg') as HTMLTextAreaElement | null
+  if (nameEl && nameEl.value !== undefined) res.name = nameEl.value
+  if (emailEl && emailEl.value !== undefined) res.email = emailEl.value
+  if (phoneEl && phoneEl.value !== undefined) res.phone = phoneEl.value
+  if (scopeEl && scopeEl.value) res.scopeId = scopeEl.value
+  if (msgEl && msgEl.value !== undefined) res.message = msgEl.value
+  return res
+}
+
 export function copyTextToClipboard(text: string, label: string): void {
   const nav = globalThis.navigator
   if (nav && nav.clipboard && typeof nav.clipboard.writeText === 'function') {

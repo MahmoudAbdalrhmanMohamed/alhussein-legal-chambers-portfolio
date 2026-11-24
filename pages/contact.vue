@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { CV_TEXT_SUMMARIES, HUSSEIN_DATA } from '../composables/portfolioContent'
-import { copyTextToClipboard, normalizeLocale, showChambersToast } from '../composables/browserHelpers'
+import {
+  copyTextToClipboard,
+  normalizeLocale,
+  showChambersToast,
+  syncScopeSelectionDom,
+  toggleSelectDropdownDom,
+  syncContactFormDomInputs
+} from '../composables/browserHelpers'
 import { useContactForm, LAWYER_EMAIL, getLegalScopeOptions } from '../composables/useContactForm'
 
 definePageMeta({
@@ -28,11 +35,11 @@ useSeoMeta({
   twitterDescription: pageDesc
 })
 
-const senderName = ref('')
-const senderEmail = ref('')
-const senderPhone = ref('')
-const selectedScopeId = ref('recruitment')
-const message = ref('')
+const senderName = useState('contact_sender_name', () => '')
+const senderEmail = useState('contact_sender_email', () => '')
+const senderPhone = useState('contact_sender_phone', () => '')
+const selectedScopeId = useState('contact_selected_scope_id', () => 'recruitment')
+const message = useState('contact_message', () => '')
 
 const {
   attachedFile,
@@ -72,6 +79,7 @@ const currentScope = computed(() => {
 
 function toggleSelectDropdown() {
   selectOpen.value = !selectOpen.value
+  toggleSelectDropdownDom(selectOpen.value)
   if (selectOpen.value) {
     const list = scopes.value || []
     for (let i = 0; i < list.length; i++) {
@@ -85,17 +93,24 @@ function toggleSelectDropdown() {
 
 function closeSelectDropdown() {
   selectOpen.value = false
+  toggleSelectDropdownDom(false)
 }
 
 function chooseScope(id: string) {
   selectedScopeId.value = id
-  if (typeof document !== 'undefined') {
-    const el = document.getElementById('native-scope-select') as any
-    if (el) {
-      el.value = id
+  closeSelectDropdown()
+  const list = scopes.value || []
+  let found = list[0]
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i]
+    if (item.id === id) {
+      found = item
+      break
     }
   }
-  closeSelectDropdown()
+  if (found) {
+    syncScopeSelectionDom(id, found.label, found.description)
+  }
 }
 
 function onChooseScope(id: string) {
@@ -197,28 +212,33 @@ const attachedDoc = computed(() => attachedFileInfo.value)
 const docError = computed(() => fileError.value || '')
 
 function syncInputs() {
-  if (typeof document !== 'undefined') {
-    const nameEl = document.getElementById('input-sender-name') as any
-    const emailEl = document.getElementById('input-sender-email') as any
-    const phoneEl = document.getElementById('input-sender-phone') as any
-    const msgEl = document.getElementById('input-inquiry-msg') as any
-    if (nameEl && nameEl.value !== undefined) senderName.value = nameEl.value
-    if (emailEl && emailEl.value !== undefined) senderEmail.value = emailEl.value
-    if (phoneEl && phoneEl.value !== undefined) senderPhone.value = phoneEl.value
-    if (msgEl && msgEl.value !== undefined) message.value = msgEl.value
-  }
+  const domValues = syncContactFormDomInputs()
+  if (domValues.name !== undefined) senderName.value = domValues.name
+  if (domValues.email !== undefined) senderEmail.value = domValues.email
+  if (domValues.phone !== undefined) senderPhone.value = domValues.phone
+  if (domValues.scopeId !== undefined) selectedScopeId.value = domValues.scopeId
+  if (domValues.message !== undefined) message.value = domValues.message
 }
 
 async function onFormSubmit() {
   syncInputs()
   const success = await submit()
   if (success) {
+    const list = scopes.value || []
+    let chosenScope = list[0]
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i]
+      if (item.id === selectedScopeId.value) {
+        chosenScope = item
+        break
+      }
+    }
     receiptData.value = submittedEntry.value || {
       id: Date.now(),
       senderName: senderName.value,
       senderEmail: senderEmail.value,
       senderPhone: senderPhone.value,
-      inquiryScope: currentScope.value?.label || '',
+      inquiryScope: chosenScope.label,
       attachment: attachedFileInfo.value
     }
     isFormSubmitted.value = true
@@ -484,18 +504,24 @@ function copyProfileData() {
               <!-- Hidden native select for 100% standard form & autofill compatibility -->
               <select
                 id="native-scope-select"
-                v-model="selectedScopeId"
                 class="sr-only"
                 tabindex="-1"
                 aria-hidden="true"
+                :value="selectedScopeId"
               >
-                <option v-for="opt in scopes" :key="opt.id" :value="opt.id">
+                <option
+                  v-for="opt in scopes"
+                  :key="opt.id"
+                  :value="opt.id"
+                  :selected="selectedScopeId === opt.id"
+                >
                   {{ opt.label }}
                 </option>
               </select>
 
               <!-- Transparent backdrop overlay when select is open -->
               <div
+                id="scope-select-backdrop"
                 v-show="selectOpen"
                 class="fixed inset-0 z-40 bg-black/10 backdrop-blur-[0.5px] cursor-default"
                 aria-hidden="true"
@@ -556,10 +582,10 @@ function copyProfileData() {
 
                   <!-- Text Preview -->
                   <div class="text-start truncate">
-                    <div class="font-bold text-sm text-[var(--ink)] truncate leading-tight">
+                    <div id="scope-trigger-label" class="font-bold text-sm text-[var(--ink)] truncate leading-tight">
                       {{ currentScope.label }}
                     </div>
-                    <div class="text-xs text-[var(--ink-muted)] truncate mt-0.5">
+                    <div id="scope-trigger-desc" class="text-xs text-[var(--ink-muted)] truncate mt-0.5">
                       {{ currentScope.description }}
                     </div>
                   </div>
@@ -606,8 +632,11 @@ function copyProfileData() {
                   :key="opt.id"
                   type="button"
                   role="option"
+                  :data-scope-id="opt.id"
+                  :data-scope-label="opt.label"
+                  :data-scope-desc="opt.description"
                   :aria-selected="selectedScopeId === opt.id ? 'true' : 'false'"
-                  class="w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer border select-none"
+                  class="w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer border select-none rx-scope-option"
                   :class="[
                     selectedScopeId === opt.id
                       ? 'bg-[var(--accent-soft)] border-[var(--accent)] shadow-xs'

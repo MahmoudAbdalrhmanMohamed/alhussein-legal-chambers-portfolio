@@ -300,7 +300,7 @@ function handleKeyDown(e: any) {
         <div
           v-else-if="isError"
           role="alert"
-          class="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center space-y-3 rx-animate-in"
+          class="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center space-y-3"
         >
           <div class="w-10 h-10 rounded-full bg-red-500/20 text-red-600 flex items-center justify-center mx-auto">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,7 +328,7 @@ function handleKeyDown(e: any) {
         <!-- 3. EMPTY STATE (Clear feedback when search query has 0 matches) -->
         <div
           v-else-if="isEmpty"
-          class="p-8 text-center space-y-3 text-[var(--ink-muted)] rx-animate-in"
+          class="p-8 text-center space-y-3 text-[var(--ink-muted)]"
         >
           <div class="w-12 h-12 rounded-full bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--ink-muted)] flex items-center justify-center mx-auto">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
