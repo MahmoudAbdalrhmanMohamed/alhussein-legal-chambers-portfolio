@@ -186,6 +186,15 @@ export function toggleSelectDropdownDom(isOpen: boolean): void {
   }
 }
 
+export function triggerFileInputDom(): void {
+  const doc = globalThis.document
+  if (!doc) return
+  const input = doc.getElementById('fileInputEl') as HTMLInputElement | null
+  if (input) {
+    input.click()
+  }
+}
+
 export function syncContactFormDomInputs(): {
   name?: string
   email?: string

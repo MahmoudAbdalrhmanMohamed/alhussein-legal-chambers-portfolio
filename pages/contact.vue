@@ -6,7 +6,8 @@ import {
   showChambersToast,
   syncScopeSelectionDom,
   toggleSelectDropdownDom,
-  syncContactFormDomInputs
+  syncContactFormDomInputs,
+  triggerFileInputDom
 } from '../composables/browserHelpers'
 import { useContactForm, LAWYER_EMAIL, getLegalScopeOptions } from '../composables/useContactForm'
 
@@ -152,21 +153,20 @@ function onSelectKeyDown(e: any) {
 }
 
 // Custom Luxury File Uploader State & Handlers
-const fileInputEl = ref<any>(null)
 const isDraggingFile = ref(false)
 
-function triggerFileInput() {
-  fileInputEl.value?.click()
+function onDropzoneKeyDown(e: any) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    triggerFileInputDom()
+  }
 }
 
-function onFileInputChange(event: any) {
+async function onFileInputChange(event: any) {
   const target = event?.target
   const file = target?.files?.[0]
   if (file) {
-    handleFileUpload(file)
-  }
-  if (target) {
-    target.value = ''
+    await handleFileUpload(file)
   }
 }
 
@@ -180,12 +180,12 @@ function onFileDragLeave(event: any) {
   isDraggingFile.value = false
 }
 
-function onFileDrop(event: any) {
+async function onFileDrop(event: any) {
   event?.preventDefault?.()
   isDraggingFile.value = false
   const file = event?.dataTransfer?.files?.[0]
   if (file) {
-    handleFileUpload(file)
+    await handleFileUpload(file)
   }
 }
 
@@ -713,7 +713,7 @@ function copyProfileData() {
 
               <!-- Hidden native file input -->
               <input
-                ref="fileInputEl"
+                id="fileInputEl"
                 type="file"
                 class="hidden"
                 accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
@@ -721,17 +721,21 @@ function copyProfileData() {
                 @change="onFileInputChange"
               >
 
-              <!-- EMPTY / DROPZONE STATE -->
-              <div
+              <!-- EMPTY / DROPZONE STATE (Native Semantic Label for 100% Zero-Hydration & Native Click) -->
+              <label
                 v-if="!attachedDoc"
+                for="fileInputEl"
+                tabindex="0"
+                role="button"
+                :aria-label="lang === 'ar' ? 'انقر لاختيار ملف أو اسحب الملف وأفلته هنا' : 'Click to select a file or drag & drop here'"
                 :class="[
-                  'border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer',
+                  'block border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]',
                   isDraggingFile
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent-soft)]'
                     : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
-                  isFormLoading ? 'opacity-60 cursor-not-allowed' : ''
+                  isFormLoading ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''
                 ]"
-                @click="triggerFileInput"
+                @keydown="onDropzoneKeyDown"
                 @dragover="onFileDragOver"
                 @dragleave="onFileDragLeave"
                 @drop="onFileDrop"
@@ -749,7 +753,7 @@ function copyProfileData() {
                     ? 'الملفات المدعومة: PDF، Word (DOCX)، الصور (PNG/JPG/WebP) — بحد أقصى 10 ميجابايت'
                     : 'Supported: PDF, Word (DOCX), Images (PNG/JPG/WebP) — up to 10 MB' }}
                 </p>
-              </div>
+              </label>
 
               <!-- SELECTED FILE ATTACHMENT CARD -->
               <div
