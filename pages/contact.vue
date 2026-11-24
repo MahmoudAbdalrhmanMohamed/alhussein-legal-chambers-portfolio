@@ -449,8 +449,10 @@ function copyProfileData() {
                   required
                   :disabled="isFormLoading"
                   :placeholder="lang === 'ar' ? 'مثال: مكتب محاماة أو الإدارة القانونية بشركة...' : 'Managing Partner / Law Firm'"
-                  class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': errors && errors.senderName }"
+                  :class="[
+                    'rx-input w-full px-3 py-2.5 text-sm transition-colors',
+                    errors && errors.senderName ? 'border-red-500 bg-red-50/20 focus:ring-red-400' : ''
+                  ]"
                 >
                 <p v-if="errors && errors.senderName" class="text-xs text-red-600 font-semibold mt-1">
                   {{ errors.senderName }}
@@ -469,8 +471,10 @@ function copyProfileData() {
                   required
                   :disabled="isFormLoading"
                   :placeholder="lang === 'ar' ? 'example@lawfirm.com' : 'counsel@lawfirm.com'"
-                  class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                  :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': errors && errors.senderEmail }"
+                  :class="[
+                    'rx-input w-full px-3 py-2.5 text-sm transition-colors',
+                    errors && errors.senderEmail ? 'border-red-500 bg-red-50/20 focus:ring-red-400' : ''
+                  ]"
                 >
                 <p v-if="errors && errors.senderEmail" class="text-xs text-red-600 font-semibold mt-1">
                   {{ errors.senderEmail }}
@@ -537,8 +541,8 @@ function copyProfileData() {
                 aria-haspopup="listbox"
                 aria-controls="scope-options-listbox"
                 :disabled="isFormLoading"
-                class="relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all shadow-xs cursor-pointer z-20"
                 :class="[
+                  'relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all shadow-xs cursor-pointer z-20',
                   selectOpen
                     ? 'border-[var(--accent)] ring-2 ring-[var(--accent-soft)] bg-[var(--surface-elevated)] shadow-lg'
                     : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:border-[var(--accent)] hover:shadow-sm',
@@ -597,8 +601,10 @@ function copyProfileData() {
                     {{ lang === 'ar' ? 'القطاع المختار' : 'Selected' }}
                   </span>
                   <svg
-                    class="w-5 h-5 text-[var(--ink-muted)] transition-transform duration-200 shrink-0"
-                    :class="{ 'rotate-180 text-[var(--accent)]': selectOpen }"
+                    :class="[
+                      'w-5 h-5 transition-transform duration-200 shrink-0',
+                      selectOpen ? 'rotate-180 text-[var(--accent)]' : 'text-[var(--ink-muted)]'
+                    ]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -636,8 +642,8 @@ function copyProfileData() {
                   :data-scope-label="opt.label"
                   :data-scope-desc="opt.description"
                   :aria-selected="selectedScopeId === opt.id ? 'true' : 'false'"
-                  class="w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer border select-none rx-scope-option"
                   :class="[
+                    'w-full text-start p-3 rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer border select-none rx-scope-option',
                     selectedScopeId === opt.id
                       ? 'bg-[var(--accent-soft)] border-[var(--accent)] shadow-xs'
                       : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:bg-[var(--surface-alt)] hover:border-[var(--accent)]'
@@ -646,8 +652,10 @@ function copyProfileData() {
                 >
                   <div class="flex items-center gap-3 min-w-0">
                     <div
-                      class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors"
-                      :class="selectedScopeId === opt.id ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]'"
+                      :class="[
+                        'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors',
+                        selectedScopeId === opt.id ? 'bg-[var(--accent)] text-white' : 'bg-[var(--surface-alt)] text-[var(--accent)] border border-[var(--border)]'
+                      ]"
                     >
                       <!-- Briefcase -->
                       <svg v-if="opt.icon === 'briefcase'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -716,8 +724,8 @@ function copyProfileData() {
               <!-- EMPTY / DROPZONE STATE -->
               <div
                 v-if="!attachedDoc"
-                class="border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer"
                 :class="[
+                  'border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer',
                   isDraggingFile
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent-soft)]'
                     : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
@@ -803,8 +811,10 @@ function copyProfileData() {
                 required
                 :disabled="isFormLoading"
                 :placeholder="lang === 'ar' ? 'يرجى كتابة تفاصيل الوظيفة، موضوع الاستشارة، أو الموعد المقترح للمقابلة...' : 'Share role details, legal mandate, or preferred interview schedule...'"
-                class="rx-input w-full px-3 py-2.5 text-sm transition-colors"
-                :class="{ 'border-red-500 bg-red-50/20 focus:ring-red-400': errors && errors.message }"
+                :class="[
+                  'rx-input w-full px-3 py-2.5 text-sm transition-colors',
+                  errors && errors.message ? 'border-red-500 bg-red-50/20 focus:ring-red-400' : ''
+                ]"
               ></textarea>
               <p v-if="errors && errors.message" class="text-xs text-red-600 font-semibold mt-1">
                 {{ errors.message }}
