@@ -707,7 +707,7 @@ function copyProfileData() {
 
             <!-- Row 4: Ultra-Luxury File Uploader Component -->
             <div class="space-y-2">
-              <label class="block text-xs font-bold text-[var(--ink)]">
+              <label class="block text-xs font-bold text-[var(--ink)] py-2">
                 {{ lang === 'ar' ? 'إرفاق مستند أو أوراق قانونية (اختياري)' : 'Attach Legal Document or Mandate File (Optional)' }}
               </label>
 
