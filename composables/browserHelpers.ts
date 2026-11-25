@@ -190,8 +190,62 @@ export function triggerFileInputDom(): void {
   const doc = globalThis.document
   if (!doc) return
   const input = doc.getElementById('fileInputEl') as HTMLInputElement | null
-  if (input) {
+  if (input && !input.disabled) {
     input.click()
+  }
+}
+
+export function resetFileInputDom(): void {
+  const doc = globalThis.document
+  if (!doc) return
+  const input = doc.getElementById('fileInputEl') as HTMLInputElement | null
+  if (input) {
+    input.value = ''
+  }
+}
+
+export function scheduleAsyncDomTask(task: () => void | Promise<void>): void {
+  setTimeout(() => {
+    void task()
+  }, 0)
+}
+
+export function triggerResumableActionDom(elementId: string): void {
+  const doc = globalThis.document
+  if (!doc) return
+  const btn = doc.getElementById(elementId) as HTMLButtonElement | null
+  if (btn && !btn.disabled) {
+    btn.click()
+  }
+}
+
+export function focusContactErrorDom(
+  errors?: Record<string, string>,
+  fallbackBannerId = 'rx-form-error-alert'
+): void {
+  const doc = globalThis.document
+  if (!doc) return
+  const fieldTargetMap: Array<[string, string]> = [
+    ['senderName', 'input-sender-name'],
+    ['senderEmail', 'input-sender-email'],
+    ['message', 'input-inquiry-msg']
+  ]
+  if (errors) {
+    for (const [key, domId] of fieldTargetMap) {
+      if (errors[key]) {
+        const input = doc.getElementById(domId) as HTMLElement | null
+        if (input) {
+          input.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          input.focus({ preventScroll: true })
+          return
+        }
+      }
+    }
+  }
+  const banner = doc.getElementById(fallbackBannerId)
+  if (banner) {
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    banner.focus({ preventScroll: true })
   }
 }
 

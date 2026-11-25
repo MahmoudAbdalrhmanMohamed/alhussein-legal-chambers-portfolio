@@ -2,14 +2,23 @@
 import { CV_TEXT_SUMMARIES, HUSSEIN_DATA } from '../composables/portfolioContent'
 import {
   copyTextToClipboard,
+  focusContactErrorDom,
   normalizeLocale,
+  resetFileInputDom,
+  scheduleAsyncDomTask,
   showChambersToast,
+  syncContactFormDomInputs,
   syncScopeSelectionDom,
   toggleSelectDropdownDom,
-  syncContactFormDomInputs,
-  triggerFileInputDom
+  triggerFileInputDom,
+  triggerResumableActionDom
 } from '../composables/browserHelpers'
-import { useContactForm, LAWYER_EMAIL, getLegalScopeOptions } from '../composables/useContactForm'
+import {
+  useContactForm,
+  buildMailtoLink,
+  LAWYER_EMAIL,
+  getLegalScopeOptions
+} from '../composables/useContactForm'
 
 definePageMeta({
   viewTransition: false
@@ -42,20 +51,29 @@ const senderPhone = useState('contact_sender_phone', () => '')
 const selectedScopeId = useState('contact_selected_scope_id', () => 'recruitment')
 const message = useState('contact_message', () => '')
 
+// Created via Resux setupContext so every template binding and computed tracks live changes
+const attachedFile = ref<any>(null)
+const attachedFileInfo = ref<any>(null)
+const fileError = ref('')
+const isFileLoading = ref(false)
+const isSubmitting = ref(false)
+const isSuccess = ref(false)
+const errorMessage = ref('')
+const errorCode = ref<any>('')
+const fieldErrors = ref<Record<string, string>>({})
+const submittedEntry = ref<any>(null)
+const pendingOutcome = ref<'success' | 'error' | ''>('')
+const activeSubmitToken = ref(0)
+
 const {
-  attachedFile,
-  attachedFileInfo,
-  fileError,
-  isSubmitting,
-  isSuccess,
-  errorMessage,
-  fieldErrors,
-  submittedEntry,
-  isEmpty,
-  mailtoLink,
-  handleFileUpload,
+  getSelectedScope,
+  clearFieldErrorIfValid,
+  prepareFileUpload,
+  completeFileUploadAsync,
   removeAttachedFile,
-  submit,
+  prepareSubmission,
+  dispatchPreparedSubmission,
+  clearErrorState,
   resetForm
 } = useContactForm({
   senderName,
@@ -63,7 +81,17 @@ const {
   senderPhone,
   selectedScopeId,
   message,
-  locale: () => lang.value
+  locale: () => lang.value,
+  attachedFile,
+  attachedFileInfo,
+  fileError,
+  isFileLoading,
+  isSubmitting,
+  isSuccess,
+  errorMessage,
+  errorCode,
+  fieldErrors,
+  submittedEntry
 })
 
 const scopes = computed(() => getLegalScopeOptions(lang.value))
@@ -79,6 +107,7 @@ const currentScope = computed(() => {
 })
 
 function toggleSelectDropdown() {
+  if (isBusy.value) return
   selectOpen.value = !selectOpen.value
   toggleSelectDropdownDom(selectOpen.value)
   if (selectOpen.value) {
@@ -120,9 +149,11 @@ function onChooseScope(id: string) {
 
 function onRemoveAttachedFile() {
   removeAttachedFile()
+  resetFileInputDom()
 }
 
 function onSelectKeyDown(e: any) {
+  if (isBusy.value) return
   const list = scopes.value || []
   if (e.key === 'Escape') {
     e.preventDefault()
@@ -156,21 +187,39 @@ function onSelectKeyDown(e: any) {
 const isDraggingFile = ref(false)
 
 function onDropzoneKeyDown(e: any) {
+  if (isBusy.value) return
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault()
     triggerFileInputDom()
   }
 }
 
-async function onFileInputChange(event: any) {
+function startAsyncFileRead(file: File) {
+  const validFile = prepareFileUpload(file)
+  if (!validFile) {
+    resetFileInputDom()
+    return
+  }
+  scheduleAsyncDomTask(async () => {
+    await completeFileUploadAsync(validFile)
+    if (fileError.value) {
+      resetFileInputDom()
+    }
+    triggerResumableActionDom('rx-file-settled-trigger')
+  })
+}
+
+function onFileInputChange(event: any) {
+  if (isBusy.value) return
   const target = event?.target
   const file = target?.files?.[0]
   if (file) {
-    await handleFileUpload(file)
+    startAsyncFileRead(file)
   }
 }
 
 function onFileDragOver(event: any) {
+  if (isBusy.value) return
   event?.preventDefault?.()
   isDraggingFile.value = true
 }
@@ -180,13 +229,18 @@ function onFileDragLeave(event: any) {
   isDraggingFile.value = false
 }
 
-async function onFileDrop(event: any) {
+function onFileDrop(event: any) {
+  if (isBusy.value) return
   event?.preventDefault?.()
   isDraggingFile.value = false
   const file = event?.dataTransfer?.files?.[0]
   if (file) {
-    await handleFileUpload(file)
+    startAsyncFileRead(file)
   }
+}
+
+function onFileSettled() {
+  // Runs after async FileReader finishes so Resux runtime patches the DOM immediately
 }
 
 function formatBytes(bytes?: number): string {
@@ -206,10 +260,25 @@ const receiptData = ref<any>({
   attachment: null
 })
 const isFormLoading = computed(() => Boolean(isSubmitting.value))
+const isBusy = computed(() => Boolean(isSubmitting.value || isFileLoading.value))
 const formError = computed(() => errorMessage.value || '')
+const formErrorCode = computed(() => errorCode.value || '')
 const errors = computed(() => fieldErrors.value || {})
+const errorCount = computed(() => Object.keys(fieldErrors.value || {}).length)
 const attachedDoc = computed(() => attachedFileInfo.value)
 const docError = computed(() => fileError.value || '')
+const docLoading = computed(() => Boolean(isFileLoading.value))
+const mailtoLink = computed(() =>
+  buildMailtoLink({
+    locale: lang.value,
+    scopeLabel: getSelectedScope().label,
+    senderName: senderName.value,
+    senderEmail: senderEmail.value,
+    senderPhone: senderPhone.value,
+    message: message.value,
+    attachedFileName: attachedFileInfo.value?.name
+  })
+)
 
 function syncInputs() {
   const domValues = syncContactFormDomInputs()
@@ -220,39 +289,69 @@ function syncInputs() {
   if (domValues.message !== undefined) message.value = domValues.message
 }
 
-async function onFormSubmit() {
+function onFieldInput(field: 'senderName' | 'senderEmail' | 'senderPhone' | 'message', event: any) {
+  const val = event?.target?.value ?? ''
+  if (field === 'senderName') senderName.value = val
+  else if (field === 'senderEmail') senderEmail.value = val
+  else if (field === 'senderPhone') senderPhone.value = val
+  else if (field === 'message') message.value = val
+
+  if (field !== 'senderPhone') {
+    clearFieldErrorIfValid(field)
+  }
+}
+
+function onFormSubmit() {
+  if (isSubmitting.value || isFileLoading.value) return
+  closeSelectDropdown()
   syncInputs()
-  const success = await submit()
-  if (success) {
-    const list = scopes.value || []
-    let chosenScope = list[0]
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i]
-      if (item.id === selectedScopeId.value) {
-        chosenScope = item
-        break
-      }
+
+  const payload = prepareSubmission()
+  if (!payload) {
+    focusContactErrorDom(fieldErrors.value, 'rx-form-error-alert')
+    return
+  }
+
+  const token = ++activeSubmitToken.value
+  scheduleAsyncDomTask(async () => {
+    const result = await dispatchPreparedSubmission(payload)
+    if (token !== activeSubmitToken.value) return
+
+    if (result.ok && result.entry) {
+      receiptData.value = result.entry
+      isFormSubmitted.value = true
+      pendingOutcome.value = 'success'
+    } else {
+      pendingOutcome.value = 'error'
     }
-    receiptData.value = submittedEntry.value || {
-      id: Date.now(),
-      senderName: senderName.value,
-      senderEmail: senderEmail.value,
-      senderPhone: senderPhone.value,
-      inquiryScope: chosenScope.label,
-      attachment: attachedFileInfo.value
-    }
-    isFormSubmitted.value = true
+    triggerResumableActionDom('rx-submit-settled-trigger')
+  })
+}
+
+function onSubmitSettled() {
+  const outcome = pendingOutcome.value
+  pendingOutcome.value = ''
+  if (outcome === 'success') {
     showChambersToast(
       lang.value === 'ar'
         ? 'تم إرسال الرسالة وتأكيد التكليف بنجاح'
         : 'Inquiry & mandate registered for Al Hussein Mohamed Abdallah'
     )
+  } else if (outcome === 'error') {
+    focusContactErrorDom(fieldErrors.value, 'rx-form-error-alert')
   }
 }
 
+function onDismissFormError() {
+  clearErrorState()
+}
+
 function onResetForm() {
+  activeSubmitToken.value += 1
   resetForm()
+  resetFileInputDom()
   isFormSubmitted.value = false
+  pendingOutcome.value = ''
   receiptData.value = {
     id: 0,
     senderName: '',
@@ -300,14 +399,33 @@ function copyProfileData() {
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <!-- Main Contact Form Section -->
-      <div class="lg:col-span-7 rx-card-static p-6 sm:p-8 space-y-5 relative overflow-visible">
-        
-        <!-- Loading Progress Bar -->
+      <div class="lg:col-span-7 rx-card-static p-6 sm:p-8 relative overflow-visible">
+        <!-- Internal zero-hydration settled hooks so Resux patches DOM immediately on async completion -->
+        <button
+          id="rx-submit-settled-trigger"
+          type="button"
+          class="sr-only"
+          tabindex="-1"
+          aria-hidden="true"
+          @click="onSubmitSettled"
+        />
+        <button
+          id="rx-file-settled-trigger"
+          type="button"
+          class="sr-only"
+          tabindex="-1"
+          aria-hidden="true"
+          @click="onFileSettled"
+        />
+
+        <!-- Indeterminate Top Progress Bar -->
         <div
           v-if="isFormLoading"
-          class="absolute top-0 left-0 right-0 h-1 bg-[var(--accent-soft)] overflow-hidden z-20 rounded-t-2xl"
+          id="rx-form-loading-bar"
+          aria-hidden="true"
+          class="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent-soft)] overflow-hidden z-20 rounded-t-xl"
         >
-          <div class="w-full h-full bg-[var(--accent)] animate-pulse" />
+          <div class="h-full bg-[var(--accent)] rx-indeterminate-bar rounded-full" />
         </div>
 
         <!-- SUCCESS STATE -->
@@ -394,8 +512,8 @@ function copyProfileData() {
         </div>
 
         <!-- FORM STATE (Empty, Filling, Loading, Error) -->
-        <div v-show="!isFormSubmitted" class="space-y-5">
-          <div class="border-b rx-divider pb-3 flex items-center justify-between gap-3">
+        <div v-show="!isFormSubmitted">
+          <div class="border-b rx-divider pb-3 mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-base font-bold text-[var(--ink)]">
               {{ lang === 'ar'
                 ? 'إرسال عرض عمل قانوني أو طلب استشارة أو تكليف قضائي'
@@ -406,35 +524,111 @@ function copyProfileData() {
             </span>
           </div>
 
-          <!-- GLOBAL ERROR ALERT -->
+          <!-- LOADING STATUS BANNER -->
           <div
-            v-if="formError"
-            role="alert"
-            class="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 space-y-2 rx-animate-in"
+            v-if="isFormLoading"
+            id="rx-form-loading-banner"
+            role="status"
+            aria-live="polite"
+            class="mb-5 p-3.5 rounded-xl border border-[var(--accent-border)] bg-[var(--accent-soft)] text-[var(--ink)] flex items-center gap-3 text-xs rx-animate-in"
           >
-            <div class="flex items-center gap-2 font-bold text-xs">
-              <svg class="w-4 h-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{{ formError }}</span>
-            </div>
-            <div class="text-[11px] pt-1 border-t border-red-500/20 flex flex-wrap items-center gap-2">
-              <span>{{ lang === 'ar' ? 'أو يمكنك التواصل مباشرة عبر تطبيق بريدك:' : 'Or send directly via your email client:' }}</span>
-              <a
-                :href="mailtoLink"
-                class="font-bold underline text-[var(--accent)] hover:opacity-80 inline-flex items-center gap-1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {{ lang === 'ar' ? 'فتح تطبيق البريد الإلكتروني (Gmail / Outlook)' : 'Open in Email Client (Gmail / Outlook)' }}
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
+            <svg class="w-4 h-4 animate-spin text-[var(--accent)] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <div class="space-y-0.5">
+              <div class="font-bold text-[var(--accent)]">
+                {{ lang === 'ar' ? 'جارٍ إرسال رسالتك إلى المكتب القانوني...' : 'Sending inquiry to Legal Chambers...' }}
+              </div>
+              <div class="text-[11px] text-[var(--ink-muted)]">
+                {{ lang === 'ar'
+                  ? 'يتم الآن توثيق البيانات وتجهيز إشعار الاستلام، يرجى الانتظار قليلاً.'
+                  : 'Registering your mandate details and preparing receipt confirmation. Please wait.' }}
+              </div>
             </div>
           </div>
 
-          <form class="space-y-4" @submit.prevent="onFormSubmit">
+          <!-- GLOBAL ERROR ALERT -->
+          <div
+            v-if="formError"
+            id="rx-form-error-alert"
+            role="alert"
+            aria-live="assertive"
+            tabindex="-1"
+            class="mb-5 p-4 rounded-xl border border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-300 space-y-2.5 rx-animate-in focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-2.5">
+                <svg class="w-5 h-5 shrink-0 text-red-600 dark:text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="space-y-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-bold text-xs">
+                      {{ formErrorCode === 'VALIDATION_ERROR'
+                        ? (lang === 'ar' ? 'يرجى استكمال الحقول المطلوبة' : 'Please Fix Required Fields')
+                        : (lang === 'ar' ? 'تعذر إتمام الإرسال حالياً' : 'Submission Error Occurred') }}
+                    </span>
+                    <span
+                      v-if="formErrorCode === 'VALIDATION_ERROR' && errorCount > 0"
+                      class="px-1.5 py-0.5 rounded bg-red-500/15 border border-red-500/30 text-[10px] font-bold"
+                    >
+                      {{ lang === 'ar' ? `${errorCount} أخطاء تحتاج للمراجعة` : `${errorCount} field(s) need attention` }}
+                    </span>
+                  </div>
+                  <p class="text-xs leading-relaxed">
+                    {{ formError }}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="rx-error-dismiss-btn"
+                type="button"
+                class="p-1 rounded-lg hover:bg-red-500/15 text-red-600 dark:text-red-300 transition-colors shrink-0 cursor-pointer"
+                :aria-label="lang === 'ar' ? 'إغلاق التنبيه' : 'Dismiss alert'"
+                @click="onDismissFormError"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="text-[11px] pt-2 border-t border-red-500/20 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  v-if="formErrorCode !== 'VALIDATION_ERROR'"
+                  id="rx-retry-submit-btn"
+                  type="button"
+                  :disabled="isBusy"
+                  class="px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 text-[11px] font-bold transition-colors cursor-pointer disabled:opacity-50"
+                  @click="onFormSubmit"
+                >
+                  {{ lang === 'ar' ? 'إعادة المحاولة الآن' : 'Retry Sending' }}
+                </button>
+                <a
+                  :href="mailtoLink"
+                  class="font-bold underline text-[var(--accent)] hover:opacity-80 inline-flex items-center gap-1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ lang === 'ar' ? 'الإرسال عبر تطبيق البريد (Gmail / Outlook)' : 'Open in Email Client (Gmail / Outlook)' }}
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <form
+            id="rx-contact-form"
+            class="space-y-4"
+            novalidate
+            :aria-busy="isFormLoading ? 'true' : 'false'"
+            @submit.prevent="onFormSubmit"
+          >
             <!-- Row 1: Sender Name & Email -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -444,18 +638,29 @@ function copyProfileData() {
                 </label>
                 <input
                   id="input-sender-name"
-                  v-model="senderName"
                   type="text"
                   required
-                  :disabled="isFormLoading"
+                  :value="senderName"
+                  :disabled="isBusy"
+                  :aria-invalid="errors && errors.senderName ? 'true' : 'false'"
+                  :aria-describedby="errors && errors.senderName ? 'err-sender-name' : undefined"
                   :placeholder="lang === 'ar' ? 'مثال: مكتب محاماة أو الإدارة القانونية بشركة...' : 'Managing Partner / Law Firm'"
                   :class="[
                     'rx-input w-full px-3 py-2.5 text-sm transition-colors',
-                    errors && errors.senderName ? 'border-red-500 bg-red-50/20 focus:ring-red-400' : ''
+                    errors && errors.senderName ? 'rx-input-error' : ''
                   ]"
+                  @input="onFieldInput('senderName', $event)"
                 >
-                <p v-if="errors && errors.senderName" class="text-xs text-red-600 font-semibold mt-1">
-                  {{ errors.senderName }}
+                <p
+                  v-if="errors && errors.senderName"
+                  id="err-sender-name"
+                  role="alert"
+                  class="text-xs text-red-600 dark:text-red-400 font-semibold mt-1.5 flex items-center gap-1"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{{ errors.senderName }}</span>
                 </p>
               </div>
 
@@ -466,18 +671,29 @@ function copyProfileData() {
                 </label>
                 <input
                   id="input-sender-email"
-                  v-model="senderEmail"
                   type="email"
                   required
-                  :disabled="isFormLoading"
+                  :value="senderEmail"
+                  :disabled="isBusy"
+                  :aria-invalid="errors && errors.senderEmail ? 'true' : 'false'"
+                  :aria-describedby="errors && errors.senderEmail ? 'err-sender-email' : undefined"
                   :placeholder="lang === 'ar' ? 'example@lawfirm.com' : 'counsel@lawfirm.com'"
                   :class="[
                     'rx-input w-full px-3 py-2.5 text-sm transition-colors',
-                    errors && errors.senderEmail ? 'border-red-500 bg-red-50/20 focus:ring-red-400' : ''
+                    errors && errors.senderEmail ? 'rx-input-error' : ''
                   ]"
+                  @input="onFieldInput('senderEmail', $event)"
                 >
-                <p v-if="errors && errors.senderEmail" class="text-xs text-red-600 font-semibold mt-1">
-                  {{ errors.senderEmail }}
+                <p
+                  v-if="errors && errors.senderEmail"
+                  id="err-sender-email"
+                  role="alert"
+                  class="text-xs text-red-600 dark:text-red-400 font-semibold mt-1.5 flex items-center gap-1"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{{ errors.senderEmail }}</span>
                 </p>
               </div>
             </div>
@@ -489,12 +705,13 @@ function copyProfileData() {
               </label>
               <input
                 id="input-sender-phone"
-                v-model="senderPhone"
                 type="tel"
-                :disabled="isFormLoading"
+                :value="senderPhone"
+                :disabled="isBusy"
                 :placeholder="lang === 'ar' ? '010XXXXXXXX أو +2010XXXXXXXX' : '+20 10X XXX XXXX'"
                 class="rx-input w-full px-3 py-2.5 text-sm"
                 dir="ltr"
+                @input="onFieldInput('senderPhone', $event)"
               >
             </div>
 
@@ -540,13 +757,13 @@ function copyProfileData() {
                 :aria-expanded="selectOpen ? 'true' : 'false'"
                 aria-haspopup="listbox"
                 aria-controls="scope-options-listbox"
-                :disabled="isFormLoading"
+                :disabled="isBusy"
                 :class="[
-                  'relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all shadow-xs cursor-pointer z-20',
+                  'relative w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all shadow-xs z-20',
                   selectOpen
                     ? 'border-[var(--accent)] ring-2 ring-[var(--accent-soft)] bg-[var(--surface-elevated)] shadow-lg'
                     : 'border-[var(--border)] bg-[var(--surface-elevated)] hover:border-[var(--accent)] hover:shadow-sm',
-                  isFormLoading ? 'opacity-60 cursor-not-allowed' : ''
+                  isBusy ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
                 ]"
                 @click="toggleSelectDropdown"
               >
@@ -717,23 +934,49 @@ function copyProfileData() {
                 type="file"
                 class="hidden"
                 accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
-                :disabled="isFormLoading"
+                :disabled="isBusy"
                 @change="onFileInputChange"
               >
 
+              <!-- FILE LOADING STATE -->
+              <div
+                v-if="docLoading"
+                id="rx-file-loading-card"
+                role="status"
+                aria-live="polite"
+                class="p-4 rounded-xl border border-[var(--accent-border)] bg-[var(--accent-soft)] flex items-center gap-3 text-xs rx-animate-in"
+              >
+                <div class="w-10 h-10 rounded-lg bg-[var(--accent)] text-[var(--accent-ink)] flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                </div>
+                <div class="space-y-0.5">
+                  <div class="font-bold text-[var(--accent)]">
+                    {{ lang === 'ar' ? 'جارٍ قراءة وتجهيز المستند...' : 'Reading and preparing attachment...' }}
+                  </div>
+                  <div class="text-[11px] text-[var(--ink-muted)]">
+                    {{ lang === 'ar' ? 'يرجى الانتظار لحظة حتى يكتمل تحميل الملف.' : 'Please wait a moment while the file finishes processing.' }}
+                  </div>
+                </div>
+              </div>
+
               <!-- EMPTY / DROPZONE STATE (Native Semantic Label for 100% Zero-Hydration & Native Click) -->
               <label
-                v-if="!attachedDoc"
+                v-else-if="!attachedDoc"
                 for="fileInputEl"
                 tabindex="0"
                 role="button"
                 :aria-label="lang === 'ar' ? 'انقر لاختيار ملف أو اسحب الملف وأفلته هنا' : 'Click to select a file or drag & drop here'"
                 :class="[
-                  'block border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]',
+                  'block border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all select-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]',
                   isDraggingFile
                     ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent-soft)]'
-                    : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
-                  isFormLoading ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''
+                    : docError
+                      ? 'border-red-500/60 bg-red-500/5 hover:border-red-500'
+                      : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-alt)]',
+                  isBusy ? 'opacity-60 cursor-not-allowed pointer-events-none' : 'cursor-pointer'
                 ]"
                 @keydown="onDropzoneKeyDown"
                 @dragover="onFileDragOver"
@@ -758,6 +1001,7 @@ function copyProfileData() {
               <!-- SELECTED FILE ATTACHMENT CARD -->
               <div
                 v-else
+                id="rx-attached-file-card"
                 class="p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/5 flex items-center justify-between gap-3 text-xs rx-animate-in shadow-xs"
               >
                 <div class="flex items-center gap-3 min-w-0">
@@ -782,7 +1026,11 @@ function copyProfileData() {
 
                 <button
                   type="button"
-                  class="px-2.5 py-1.5 rounded-lg border border-red-500/30 text-red-600 hover:bg-red-500/10 text-xs font-semibold shrink-0 flex items-center gap-1 transition-colors cursor-pointer"
+                  :disabled="isBusy"
+                  :class="[
+                    'px-2.5 py-1.5 rounded-lg border border-red-500/30 text-red-600 hover:bg-red-500/10 text-xs font-semibold shrink-0 flex items-center gap-1 transition-colors',
+                    isBusy ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                  ]"
                   :title="lang === 'ar' ? 'حذف الملف المرفق' : 'Remove attached file'"
                   @click="onRemoveAttachedFile"
                 >
@@ -794,8 +1042,13 @@ function copyProfileData() {
               </div>
 
               <!-- FILE ERROR MESSAGE -->
-              <div v-if="docError" class="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
-                <svg class="w-4 h-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                v-if="docError"
+                id="rx-file-error-alert"
+                role="alert"
+                class="p-3 rounded-lg border border-red-500/35 bg-red-500/10 text-red-700 dark:text-red-300 text-xs flex items-center gap-2 rx-animate-in"
+              >
+                <svg class="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>{{ docError }}</span>
@@ -810,18 +1063,29 @@ function copyProfileData() {
               </label>
               <textarea
                 id="input-inquiry-msg"
-                v-model="message"
                 rows="4"
                 required
-                :disabled="isFormLoading"
+                :value="message"
+                :disabled="isBusy"
+                :aria-invalid="errors && errors.message ? 'true' : 'false'"
+                :aria-describedby="errors && errors.message ? 'err-inquiry-message' : undefined"
                 :placeholder="lang === 'ar' ? 'يرجى كتابة تفاصيل الوظيفة، موضوع الاستشارة، أو الموعد المقترح للمقابلة...' : 'Share role details, legal mandate, or preferred interview schedule...'"
                 :class="[
                   'rx-input w-full px-3 py-2.5 text-sm transition-colors',
-                  errors && errors.message ? 'border-red-500 bg-red-50/20 focus:ring-red-400' : ''
+                  errors && errors.message ? 'rx-input-error' : ''
                 ]"
+                @input="onFieldInput('message', $event)"
               ></textarea>
-              <p v-if="errors && errors.message" class="text-xs text-red-600 font-semibold mt-1">
-                {{ errors.message }}
+              <p
+                v-if="errors && errors.message"
+                id="err-inquiry-message"
+                role="alert"
+                class="text-xs text-red-600 dark:text-red-400 font-semibold mt-1.5 flex items-center gap-1"
+              >
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ errors.message }}</span>
               </p>
             </div>
 
@@ -829,17 +1093,21 @@ function copyProfileData() {
             <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t rx-divider">
               <button
                 id="rx-submit-btn"
-                type="button"
-                :disabled="isFormLoading"
-                class="px-6 py-2.5 text-sm font-bold rx-btn-primary flex items-center justify-center gap-2 min-w-[200px] disabled:opacity-60 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
-                @click="onFormSubmit"
+                type="submit"
+                :disabled="isBusy"
+                :aria-busy="isFormLoading ? 'true' : 'false'"
+                :class="[
+                  'px-6 py-2.5 text-sm font-bold rx-btn-primary flex items-center justify-center gap-2 min-w-[215px] transition-all shadow-sm',
+                  isBusy ? 'opacity-65 cursor-not-allowed' : 'cursor-pointer'
+                ]"
               >
                 <!-- Animated Spinner during loading -->
                 <svg
-                  v-if="isFormLoading"
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  v-if="isBusy"
+                  class="animate-spin h-4 w-4 shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -848,7 +1116,9 @@ function copyProfileData() {
                 <span>
                   {{ isFormLoading
                     ? (lang === 'ar' ? 'جارٍ إرسال الرسالة والتكليف...' : 'Dispatching Inquiry...')
-                    : (lang === 'ar' ? 'إرسال الرسالة والتكليف القانوني ←' : 'Send Legal Inquiry →') }}
+                    : docLoading
+                      ? (lang === 'ar' ? 'جارٍ تجهيز الملف المرفق...' : 'Preparing Attachment...')
+                      : (lang === 'ar' ? 'إرسال الرسالة والتكليف القانوني ←' : 'Send Legal Inquiry →') }}
                 </span>
               </button>
 

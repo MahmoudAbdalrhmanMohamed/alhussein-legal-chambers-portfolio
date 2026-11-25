@@ -235,6 +235,14 @@ html[lang="en"] .font-serif-editorial {
 .rx-btn-primary:active {
   transform: translateY(0) scale(0.98);
 }
+.rx-btn-primary:disabled,
+.rx-btn-primary:disabled:hover,
+.rx-btn-outline:disabled,
+.rx-btn-outline:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
 
 .rx-btn-accent {
   background-color: var(--accent);
@@ -304,12 +312,50 @@ html[lang="en"] .font-serif-editorial {
   color: var(--ink);
   border: 1px solid var(--border);
   border-radius: 8px;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, opacity 150ms ease;
 }
 .rx-input:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.rx-input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background-color: var(--surface-alt);
+}
+.rx-input.rx-input-error {
+  border-color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.04);
+}
+.rx-input.rx-input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+:root[data-theme="dark"] .rx-input.rx-input-error {
+  border-color: #f87171;
+  background-color: rgba(248, 113, 113, 0.08);
+}
+:root[data-theme="dark"] .rx-input.rx-input-error:focus {
+  border-color: #f87171;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.22);
+}
+
+@keyframes rxIndeterminateBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.rx-indeterminate-bar {
+  width: 55%;
+  animation: rxIndeterminateBar 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .rx-divider {
