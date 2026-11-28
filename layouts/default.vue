@@ -839,7 +839,7 @@ function onMobileQuickIndexClick() {
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
           <span>{{ lang === 'ar' ? 'تصميم وتطوير' : 'Crafted by' }}</span>
           <a
-            href="https://mahmouddeveloperm.github.io/Portfolio/"
+            href="https://mahmoudabdalrhmanmohamed.github.io/Portfolio/"
             target="_blank"
             rel="noopener noreferrer"
             class="font-bold text-[var(--accent)] underline underline-offset-4 hover:opacity-80 transition-opacity"
