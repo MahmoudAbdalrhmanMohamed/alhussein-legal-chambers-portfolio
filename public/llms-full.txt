@@ -63,4 +63,4 @@ Egyptian Bar Association member and Bachelor of Laws (LL.B.) graduate from Helwa
 ---
 
 ## Attribution
-Designed and engineered by Mahmoud Abdelrahman (https://mahmouddeveloperm.github.io/Portfolio/) using Resux (https://github.com/MahmoudAbdalrhmanMohamed/resux).
+Designed and engineered by Mahmoud Abdelrahman (https://mahmoudabdalrhmanmohamed.github.io/Portfolio/) using Resux (https://github.com/MahmoudAbdalrhmanMohamed/resux).
